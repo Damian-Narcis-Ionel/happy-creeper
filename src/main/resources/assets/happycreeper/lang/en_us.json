@@ -1,7 +1,11 @@
 {
-  "itemGroup.happycreeper": "Example Mod Tab",
-  "block.happycreeper.example_block": "Example Block",
-  "item.happycreeper.example_item": "Example Item",
+  "item.happycreeper.anti_blast_biscuit": "Anti-Blast Biscuit",
+  "item.happycreeper.sweet_gunpowder_biscuit": "Sweet Gunpowder Biscuit",
+  "message.happycreeper.already_weakened": "This creeper is already weakened.",
+  "message.happycreeper.need_to_weaken_first": "You need to weaken this creeper first.",
+  "message.happycreeper.already_tamed": "This creeper is already your friend.",
+  "message.happycreeper.creeper_weakened": "The creeper has been weakened.",
+  "message.happycreeper.creeper_tamed": "The creeper is now your friend.",
 
   "happycreeper.configuration.title": "Happy Creeper Configs",
   "happycreeper.configuration.section.happycreeper.common.toml": "Happy Creeper Configs",
