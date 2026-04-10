@@ -30,7 +30,9 @@ public final class WeakenedCreeperExplosionHandler {
             return;
         }
 
-        spawnIdleWeakenedParticles(creeper, state);
+        if (state == CreeperState.WEAKENED) {
+            spawnIdleWeakenedParticles(creeper);
+        }
 
         CompoundTag data = creeper.getPersistentData();
         int cooldown = data.getInt(FIZZLE_COOLDOWN_TAG);
@@ -81,11 +83,7 @@ public final class WeakenedCreeperExplosionHandler {
                 0.8F + creeper.getRandom().nextFloat() * 0.2F);
     }
 
-    private static void spawnIdleWeakenedParticles(Creeper creeper, CreeperState state) {
-        if (state != CreeperState.WEAKENED) {
-            return;
-        }
-
+    private static void spawnIdleWeakenedParticles(Creeper creeper) {
         if (!(creeper.level() instanceof ServerLevel serverLevel)) {
             return;
         }
