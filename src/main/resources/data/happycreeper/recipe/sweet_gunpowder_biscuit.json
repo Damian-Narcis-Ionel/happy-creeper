@@ -1,15 +1,16 @@
 {
   "type": "minecraft:crafting_shapeless",
+  "category": "misc",
   "ingredients": [
     {
       "item": "happycreeper:biscuit"
     },
     {
-      "item": "minecraft:milk_bucket"
+      "item": "minecraft:gunpowder"
     }
   ],
   "result": {
-    "id": "happycreeper:anti_blast_biscuit",
+    "id": "happycreeper:sweet_gunpowder_biscuit",
     "count": 1
   }
 }
