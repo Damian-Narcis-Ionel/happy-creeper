@@ -31,6 +31,8 @@ public class HappyCreeper {
     // Create a Deferred Register to hold Items which will all be registered under the "happycreeper" namespace
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
 
+    public static final DeferredItem<Item> BISCUIT = ITEMS.registerSimpleItem("biscuit",
+            new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.3f).build()));
     public static final DeferredItem<Item> ANTI_BLAST_BISCUIT = ITEMS.registerSimpleItem("anti_blast_biscuit",
             new Item.Properties().food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).build()));
     public static final DeferredItem<Item> SWEET_GUNPOWDER_BISCUIT = ITEMS.registerSimpleItem("sweet_gunpowder_biscuit",
@@ -72,6 +74,7 @@ public class HappyCreeper {
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
+            event.accept(BISCUIT);
             event.accept(ANTI_BLAST_BISCUIT);
             event.accept(SWEET_GUNPOWDER_BISCUIT);
         }
