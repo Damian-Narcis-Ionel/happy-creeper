@@ -88,7 +88,7 @@ public final class WeakenedCreeperExplosionHandler {
             return;
         }
 
-        if (creeper.tickCount % 20 != 0) {
+        if (creeper.tickCount % 10 != 0) {
             return;
         }
 
@@ -99,7 +99,7 @@ public final class WeakenedCreeperExplosionHandler {
                 creeper.getX(),
                 creeper.getY() + 1.0D,
                 creeper.getZ(),
-                3,
+                5,
                 red,
                 green,
                 blue,
