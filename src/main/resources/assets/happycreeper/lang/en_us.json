@@ -15,11 +15,13 @@
   "message.happycreeper.already_weakened": "This creeper is already weakened.",
   "message.happycreeper.need_to_weaken_first": "You need to weaken this creeper first.",
   "message.happycreeper.need_creeper_head": "You must wear a creeper head to weaken this creeper.",
+  "message.happycreeper.already_blue": "Your creeper is already blue.",
   "message.happycreeper.already_tamed": "This creeper is already your friend.",
   "message.happycreeper.already_full_health": "Your creeper is already at full health.",
   "message.happycreeper.creeper_weakened": "The creeper has been weakened.",
   "message.happycreeper.creeper_tamed": "The creeper is now your friend.",
   "message.happycreeper.creeper_healed": "Your creeper feels better already.",
+  "message.happycreeper.creeper_recolored_blue": "Your creeper is now blue.",
   "message.happycreeper.creeper_staying": "Your creeper will stay here.",
   "message.happycreeper.creeper_following": "Your creeper is following you again.",
 
