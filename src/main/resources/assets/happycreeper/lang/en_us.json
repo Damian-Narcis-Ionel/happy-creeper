@@ -22,8 +22,6 @@
   "message.happycreeper.creeper_healed": "Your creeper feels better already.",
   "message.happycreeper.creeper_staying": "Your creeper will stay here.",
   "message.happycreeper.creeper_following": "Your creeper is following you again.",
-  "message.happycreeper.damage_log": "[Creeper] Took %1$s damage from %2$s. HP: %3$s/%4$s",
-  "message.happycreeper.heal_log": "[Creeper] Healed %1$s HP. HP: %2$s/%3$s",
 
   "happycreeper.configuration.title": "Happy Creeper Configs",
   "happycreeper.configuration.section.happycreeper.common.toml": "Happy Creeper Configs",

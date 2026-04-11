@@ -103,7 +103,6 @@ public final class CreeperInteractionHandler {
             consumeItem(player, stack);
             creeper.heal(2.0F);
             sendFeedback(player, creeper, "message.happycreeper.creeper_healed");
-            TamedCreeperLogHelper.logHealing(creeper, 2.0F);
             event.setCanceled(true);
             return;
         }
@@ -126,7 +125,6 @@ public final class CreeperInteractionHandler {
             consumeItem(player, stack);
             creeper.heal(4.0F);
             sendFeedback(player, creeper, "message.happycreeper.creeper_healed");
-            TamedCreeperLogHelper.logHealing(creeper, 4.0F);
             event.setCanceled(true);
             return;
         }
