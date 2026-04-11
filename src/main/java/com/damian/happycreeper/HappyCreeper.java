@@ -39,7 +39,7 @@ public class HappyCreeper {
             new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.3f).build()));
     public static final DeferredItem<Item> ANTI_BLAST_BISCUIT = ITEMS.registerSimpleItem("anti_blast_biscuit", new Item.Properties());
     public static final DeferredItem<Item> SWEET_GUNPOWDER_BISCUIT = ITEMS.registerSimpleItem("sweet_gunpowder_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> RAINBOW_COOKIE = ITEMS.registerSimpleItem("rainbow_cookie", new Item.Properties());
+    public static final DeferredItem<Item> RAINBOW_BISCUIT = ITEMS.registerSimpleItem("rainbow_biscuit", new Item.Properties());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -83,7 +83,7 @@ public class HappyCreeper {
             event.accept(BISCUIT);
             event.accept(ANTI_BLAST_BISCUIT);
             event.accept(SWEET_GUNPOWDER_BISCUIT);
-            event.accept(RAINBOW_COOKIE);
+            event.accept(RAINBOW_BISCUIT);
         }
     }
 

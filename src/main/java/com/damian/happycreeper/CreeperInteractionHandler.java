@@ -40,7 +40,7 @@ public final class CreeperInteractionHandler {
         CreeperState currentState = CreeperState.get(creeper);
         boolean isSweetBiscuit = stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT.get());
         boolean isHealingGunpowder = stack.is(Items.GUNPOWDER);
-        boolean isRainbowCookie = stack.is(HappyCreeper.RAINBOW_COOKIE.get());
+        boolean isRainbowBiscuit = stack.is(HappyCreeper.RAINBOW_BISCUIT.get());
         boolean isBlueDye = stack.is(Items.BLUE_DYE);
         boolean isCyanDye = stack.is(Items.CYAN_DYE);
         boolean isGrayDye = stack.is(Items.GRAY_DYE);
@@ -73,7 +73,7 @@ public final class CreeperInteractionHandler {
             return;
         }
 
-        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowCookie && !isBlueDye && !isCyanDye && !isGrayDye && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
+        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowBiscuit && !isBlueDye && !isCyanDye && !isGrayDye && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
             if (currentState == CreeperState.TAMED && stack.isEmpty() && TamedCreeperOwner.isOwner(creeper, player)) {
                 boolean staying = TamedCreeperCommandState.toggleStaying(creeper);
                 player.displayClientMessage(Component.translatable(staying
@@ -91,7 +91,7 @@ public final class CreeperInteractionHandler {
             return;
         }
 
-        if (isRainbowCookie) {
+        if (isRainbowBiscuit) {
             if (currentState != CreeperState.TAMED) {
                 return;
             }
