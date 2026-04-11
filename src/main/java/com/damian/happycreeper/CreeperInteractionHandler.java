@@ -40,7 +40,16 @@ public final class CreeperInteractionHandler {
         CreeperState currentState = CreeperState.get(creeper);
         boolean isSweetBiscuit = stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT.get());
         boolean isHealingGunpowder = stack.is(Items.GUNPOWDER);
+        boolean isRainbowCookie = stack.is(HappyCreeper.RAINBOW_COOKIE.get());
         boolean isBlueDye = stack.is(Items.BLUE_DYE);
+        boolean isCyanDye = stack.is(Items.CYAN_DYE);
+        boolean isGrayDye = stack.is(Items.GRAY_DYE);
+        boolean isLimeDye = stack.is(Items.LIME_DYE);
+        boolean isYellowDye = stack.is(Items.YELLOW_DYE);
+        boolean isPinkDye = stack.is(Items.PINK_DYE);
+        boolean isPurpleDye = stack.is(Items.PURPLE_DYE);
+        boolean isRedDye = stack.is(Items.RED_DYE);
+        boolean isBlackDye = stack.is(Items.BLACK_DYE);
 
         if (stack.is(HappyCreeper.ANTI_BLAST_BISCUIT.get())) {
             if (!isWearingCreeperHead(player)) {
@@ -64,7 +73,7 @@ public final class CreeperInteractionHandler {
             return;
         }
 
-        if (!isSweetBiscuit && !isHealingGunpowder && !isBlueDye) {
+        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowCookie && !isBlueDye && !isCyanDye && !isGrayDye && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
             if (currentState == CreeperState.TAMED && stack.isEmpty() && TamedCreeperOwner.isOwner(creeper, player)) {
                 boolean staying = TamedCreeperCommandState.toggleStaying(creeper);
                 player.displayClientMessage(Component.translatable(staying
@@ -82,7 +91,7 @@ public final class CreeperInteractionHandler {
             return;
         }
 
-        if (isBlueDye) {
+        if (isRainbowCookie) {
             if (currentState != CreeperState.TAMED) {
                 return;
             }
@@ -94,16 +103,58 @@ public final class CreeperInteractionHandler {
                 return;
             }
 
-            if (TamedCreeperAppearance.isBlue(creeper)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_blue")
+            consumeItem(player, stack);
+            TamedCreeperAppearance.setVariant(creeper, TamedCreeperAppearance.RAINBOW_VARIANT);
+            sendFeedback(player, creeper, "message.happycreeper.creeper_recolored_rainbow");
+            event.setCanceled(true);
+            return;
+        }
+
+        if (isBlueDye || isCyanDye || isGrayDye || isLimeDye || isYellowDye || isPinkDye || isPurpleDye || isRedDye || isBlackDye) {
+            if (currentState != CreeperState.TAMED) {
+                return;
+            }
+
+            if (!TamedCreeperOwner.isOwner(creeper, player)) {
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
                         .withStyle(ChatFormatting.YELLOW), true);
                 event.setCanceled(true);
                 return;
             }
 
             consumeItem(player, stack);
-            TamedCreeperAppearance.setBlue(creeper, true);
-            sendFeedback(player, creeper, "message.happycreeper.creeper_recolored_blue");
+            int variant;
+            String messageKey;
+            if (isBlueDye) {
+                variant = TamedCreeperAppearance.BLUE_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_blue";
+            } else if (isCyanDye) {
+                variant = TamedCreeperAppearance.CYAN_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_cyan";
+            } else if (isGrayDye) {
+                variant = TamedCreeperAppearance.GRAY_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_gray";
+            } else if (isLimeDye) {
+                variant = TamedCreeperAppearance.HAPPY_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_happy";
+            } else if (isYellowDye) {
+                variant = TamedCreeperAppearance.YELLOW_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_yellow";
+            } else if (isPinkDye) {
+                variant = TamedCreeperAppearance.PINK_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_pink";
+            } else if (isPurpleDye) {
+                variant = TamedCreeperAppearance.PURPLE_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_purple";
+            } else if (isBlackDye) {
+                variant = TamedCreeperAppearance.BLACK_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_black";
+            } else {
+                variant = TamedCreeperAppearance.RED_VARIANT;
+                messageKey = "message.happycreeper.creeper_recolored_red";
+            }
+            TamedCreeperAppearance.setVariant(creeper, variant);
+            sendFeedback(player, creeper, messageKey);
             event.setCanceled(true);
             return;
         }
@@ -160,6 +211,7 @@ public final class CreeperInteractionHandler {
         CreeperState.set(creeper, CreeperState.TAMED);
         TamedCreeperOwner.setOwner(creeper, player.getUUID());
         TamedCreeperCommandState.setStaying(creeper, false);
+        TamedCreeperAppearance.setVariant(creeper, TamedCreeperAppearance.HAPPY_VARIANT);
         sendFeedback(player, creeper, "message.happycreeper.creeper_tamed");
         event.setCanceled(true);
     }

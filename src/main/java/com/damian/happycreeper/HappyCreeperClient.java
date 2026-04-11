@@ -1,6 +1,6 @@
 package com.damian.happycreeper;
 
-import com.damian.happycreeper.client.BlueCreeperTintLayer;
+import com.damian.happycreeper.client.CreeperVariantTextureLayer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
@@ -38,7 +38,7 @@ public class HappyCreeperClient {
     static void onAddLayers(EntityRenderersEvent.AddLayers event) {
         CreeperRenderer creeperRenderer = event.getRenderer(EntityType.CREEPER);
         if (creeperRenderer != null) {
-            creeperRenderer.addLayer(new BlueCreeperTintLayer(creeperRenderer));
+            creeperRenderer.addLayer(new CreeperVariantTextureLayer(creeperRenderer));
         }
     }
 }

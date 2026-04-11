@@ -1,30 +1,28 @@
-/*
-1. kamiza boom when dies
-2. make it so that he can wear some armor
-- water armor -> no dmg to surrounding blocks
-- like wolf armor so he does not die so fast
-- tnt armor -> explosion more boom
-- slime armor -> jumps into enemies and damages them
-- infestation armor -> spawns little creepers when he dies
-- cactus armor -> stick to mobs (or maybe do the slime one)
-*/
 {
   "item.happycreeper.biscuit": "Biscuit",
   "item.happycreeper.anti_blast_biscuit": "Anti-Blast Biscuit",
   "item.happycreeper.sweet_gunpowder_biscuit": "Sweet Gunpowder Biscuit",
+  "item.happycreeper.rainbow_cookie": "Rainbow Cookie",
   "message.happycreeper.already_weakened": "This creeper is already weakened.",
   "message.happycreeper.need_to_weaken_first": "You need to weaken this creeper first.",
   "message.happycreeper.need_creeper_head": "You must wear a creeper head to weaken this creeper.",
-  "message.happycreeper.already_blue": "Your creeper is already blue.",
   "message.happycreeper.already_tamed": "This creeper is already your friend.",
   "message.happycreeper.already_full_health": "Your creeper is already at full health.",
   "message.happycreeper.creeper_weakened": "The creeper has been weakened.",
   "message.happycreeper.creeper_tamed": "The creeper is now your friend.",
   "message.happycreeper.creeper_healed": "Your creeper feels better already.",
   "message.happycreeper.creeper_recolored_blue": "Your creeper is now blue.",
+  "message.happycreeper.creeper_recolored_cyan": "Your creeper is now cyan.",
+  "message.happycreeper.creeper_recolored_gray": "Your creeper is now gray.",
+  "message.happycreeper.creeper_recolored_happy": "Your creeper is happy green again.",
+  "message.happycreeper.creeper_recolored_yellow": "Your creeper is now yellow.",
+  "message.happycreeper.creeper_recolored_pink": "Your creeper is now pink.",
+  "message.happycreeper.creeper_recolored_purple": "Your creeper is now purple.",
+  "message.happycreeper.creeper_recolored_rainbow": "Your creeper is now rainbow.",
+  "message.happycreeper.creeper_recolored_red": "Your creeper is now red.",
+  "message.happycreeper.creeper_recolored_black": "Your creeper is now black.",
   "message.happycreeper.creeper_staying": "Your creeper will stay here.",
   "message.happycreeper.creeper_following": "Your creeper is following you again.",
-
   "happycreeper.configuration.title": "Happy Creeper Configs",
   "happycreeper.configuration.section.happycreeper.common.toml": "Happy Creeper Configs",
   "happycreeper.configuration.section.happycreeper.common.toml.title": "Happy Creeper Configs",
