@@ -242,6 +242,6 @@ public final class CreeperInteractionHandler {
     }
 
     private static boolean isWearingCreeperHead(Player player) {
-        return player.getItemBySlot(EquipmentSlot.HEAD).is(Items.CREEPER_HEAD);
+        return HappyCreeper.isCreeperDisguise(player.getItemBySlot(EquipmentSlot.HEAD));
     }
 }

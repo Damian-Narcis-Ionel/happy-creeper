@@ -12,7 +12,7 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 
 ## Core Loop
 
-1. Wear a `Creeper Head` so creepers do not behave normally around you.
+1. Wear a `Creeper Head` or `Happy Creeper Mask` so creepers do not behave normally around you.
 2. Feed a creeper an `Anti-Blast Biscuit` to weaken it.
 3. Feed the weakened creeper a `Sweet Gunpowder Biscuit` to tame it.
 4. Right-click your tamed creeper with an empty main hand to switch between `follow` and `stay`.
@@ -21,14 +21,14 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 ## Current Features
 
 - Creeper-head protection:
-  - nearby creepers do not aggro and explode normally while you wear a creeper head
+  - nearby creepers do not aggro and explode normally while you wear a creeper head or Happy Creeper Mask
   - if you attack a protected creeper, it can retaliate again
 - Creeper states:
   - `normal`
   - `weakened`
   - `tamed`
 - Weakening:
-  - requires wearing a `Creeper Head`
+  - requires wearing a `Creeper Head` or `Happy Creeper Mask`
   - uses the `Anti-Blast Biscuit`
   - gives the creeper a continuous weakened particle effect
   - prevents the normal suicide explosion behavior
@@ -69,10 +69,13 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 - `Anti-Blast Biscuit`
 - `Sweet Gunpowder Biscuit`
 - `Rainbow Biscuit`
+- `Happy Creeper Mask`
 
 `Biscuit` is edible.
 
 `Anti-Blast Biscuit`, `Sweet Gunpowder Biscuit`, and `Rainbow Biscuit` are interaction items and are not edible by players.
+
+`Happy Creeper Mask` is a wearable disguise item used for the weakening step.
 
 ## Recipes
 
@@ -109,6 +112,16 @@ The milk bucket returns an empty bucket after crafting.
 There is currently no crafting recipe.
 
 It is found as loot in generated chests.
+
+### Happy Creeper Mask
+
+Craft with:
+
+```text
+Leather Leather Leather
+Leather Green Dye Leather
+      Gunpowder
+```
 
 ## Development
 

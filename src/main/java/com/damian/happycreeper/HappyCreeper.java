@@ -8,6 +8,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -40,6 +42,8 @@ public class HappyCreeper {
     public static final DeferredItem<Item> ANTI_BLAST_BISCUIT = ITEMS.registerSimpleItem("anti_blast_biscuit", new Item.Properties());
     public static final DeferredItem<Item> SWEET_GUNPOWDER_BISCUIT = ITEMS.registerSimpleItem("sweet_gunpowder_biscuit", new Item.Properties());
     public static final DeferredItem<Item> RAINBOW_BISCUIT = ITEMS.registerSimpleItem("rainbow_biscuit", new Item.Properties());
+    public static final DeferredItem<Item> FAKE_HAPPY_CREEPER_HEAD = ITEMS.register("fake_happy_creeper_head",
+            () -> new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -85,6 +89,14 @@ public class HappyCreeper {
             event.accept(SWEET_GUNPOWDER_BISCUIT);
             event.accept(RAINBOW_BISCUIT);
         }
+
+        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            event.accept(FAKE_HAPPY_CREEPER_HEAD);
+        }
+    }
+
+    public static boolean isCreeperDisguise(ItemStack stack) {
+        return stack.is(Items.CREEPER_HEAD) || stack.is(FAKE_HAPPY_CREEPER_HEAD.get());
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

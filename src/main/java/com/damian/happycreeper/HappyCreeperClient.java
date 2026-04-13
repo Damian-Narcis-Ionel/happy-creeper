@@ -1,9 +1,12 @@
 package com.damian.happycreeper;
 
 import com.damian.happycreeper.client.CreeperVariantTextureLayer;
+import com.damian.happycreeper.client.HappyCreeperMaskLayer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -39,6 +42,13 @@ public class HappyCreeperClient {
         CreeperRenderer creeperRenderer = event.getRenderer(EntityType.CREEPER);
         if (creeperRenderer != null) {
             creeperRenderer.addLayer(new CreeperVariantTextureLayer(creeperRenderer));
+        }
+
+        for (PlayerSkin.Model skinModel : event.getSkins()) {
+            PlayerRenderer playerRenderer = event.getSkin(skinModel);
+            if (playerRenderer != null) {
+                playerRenderer.addLayer(new HappyCreeperMaskLayer(playerRenderer, event.getEntityModels()));
+            }
         }
     }
 }
