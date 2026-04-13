@@ -10,7 +10,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -71,7 +70,7 @@ public final class CreeperHeadProtectionHandler {
 
     private static boolean isProtectedPlayer(LivingEntity entity) {
         return entity instanceof Player player
-                && player.getItemBySlot(EquipmentSlot.HEAD).is(Items.CREEPER_HEAD);
+                && HappyCreeper.isCreeperDisguise(player.getItemBySlot(EquipmentSlot.HEAD));
     }
 
     private static Player getResponsiblePlayer(DamageSource source) {
