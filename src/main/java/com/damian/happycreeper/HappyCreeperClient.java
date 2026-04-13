@@ -3,7 +3,6 @@ package com.damian.happycreeper;
 import com.damian.happycreeper.client.CreeperVariantTextureLayer;
 import com.damian.happycreeper.client.HappyCreeperMaskLayer;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -32,9 +31,6 @@ public class HappyCreeperClient {
 
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
-        // Some client setup code
-        HappyCreeper.LOGGER.info("HELLO FROM CLIENT SETUP");
-        HappyCreeper.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
     }
 
     @SubscribeEvent
