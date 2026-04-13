@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "entries": [
+    "happycreeper:add_rainbow_biscuit_to_abandoned_mineshaft",
+    "happycreeper:add_rainbow_biscuit_to_ancient_city",
+    "happycreeper:add_rainbow_biscuit_to_bastion_treasure",
+    "happycreeper:add_rainbow_biscuit_to_desert_pyramid",
+    "happycreeper:add_rainbow_biscuit_to_jungle_temple",
+    "happycreeper:add_rainbow_biscuit_to_nether_bridge",
+    "happycreeper:add_rainbow_biscuit_to_pillager_outpost",
+    "happycreeper:add_rainbow_biscuit_to_shipwreck_treasure",
+    "happycreeper:add_rainbow_biscuit_to_simple_dungeon",
+    "happycreeper:add_rainbow_biscuit_to_stronghold_corridor",
+    "happycreeper:add_rainbow_biscuit_to_stronghold_crossing",
+    "happycreeper:add_rainbow_biscuit_to_woodland_mansion"
+  ]
+}

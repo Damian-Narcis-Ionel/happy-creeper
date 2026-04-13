@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Creeper;
@@ -39,12 +40,13 @@ public final class TamedCreeperOwner {
     }
 
     public static Optional<ServerPlayer> getOwner(Creeper creeper) {
-        if (!(creeper.level() instanceof ServerLevel serverLevel)) {
+        MinecraftServer server = creeper.getServer();
+        if (server == null) {
             return Optional.empty();
         }
 
         return getOwnerUuid(creeper)
-                .map(serverLevel::getPlayerByUUID)
+                .map(server.getPlayerList()::getPlayer)
                 .filter(ServerPlayer.class::isInstance)
                 .map(ServerPlayer.class::cast);
     }

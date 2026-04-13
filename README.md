@@ -1,69 +1,90 @@
 # Happy Creeper
 
-`Happy Creeper` is a NeoForge mod for Minecraft `1.21.1` that lets you weaken, tame, and fight alongside creepers instead of treating them only as enemies.
+`Happy Creeper` is a NeoForge mod for Minecraft `1.21.1` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
 
-The mod is being built for a real `1.21.1` modpack, so the focus is on survival-friendly mechanics rather than one-off demo features.
+The mod is being developed for actual survival play, so the mechanics are meant to feel usable in a normal world and modpack, not just in a test map.
 
-## Target Platform
+## Platform
 
 - Minecraft: `1.21.1`
-- Mod Loader: `NeoForge`
+- Loader: `NeoForge`
 - Java: `21`
 
-## Current Gameplay Loop
+## Core Loop
 
-1. Wear a `Creeper Head` to approach a creeper safely.
-2. Feed it an `Anti-Blast Biscuit` to weaken it.
+1. Wear a `Creeper Head` so creepers do not behave normally around you.
+2. Feed a creeper an `Anti-Blast Biscuit` to weaken it.
 3. Feed the weakened creeper a `Sweet Gunpowder Biscuit` to tame it.
-4. Command your tamed creeper to follow you or stay in place.
-5. Heal it with `Gunpowder` or a `Sweet Gunpowder Biscuit`.
+4. Right-click your tamed creeper with an empty main hand to switch between `follow` and `stay`.
+5. Heal it with `Gunpowder` or another `Sweet Gunpowder Biscuit`.
 
-## Implemented Features
+## Current Features
 
-- Creeper-head protection prevents nearby creepers from behaving normally toward the player
-- Damaging a protected creeper makes it retaliate again for a short time
-- Persistent creeper state system:
+- Creeper-head protection:
+  - nearby creepers do not aggro and explode normally while you wear a creeper head
+  - if you attack a protected creeper, it can retaliate again
+- Creeper states:
   - `normal`
   - `weakened`
   - `tamed`
-- `Anti-Blast Biscuit` interaction for weakening
-- `Sweet Gunpowder Biscuit` interaction for taming
-- Weakened creepers fail to explode normally and stay alive
-- Weakened creepers emit a visible debuff-style particle effect
-- Tamed creepers:
-  - remember their owner
-  - do not target players
-  - follow their owner
-  - can be told to stay
-  - teleport back near the owner if they fall too far behind
-  - defend the owner
-  - use a manual contact blast / shove attack instead of a normal explosion
-  - trigger a larger non-destructive death burst when they die
-  - gain bonus max health
-- Owner-only healing with:
-  - `Gunpowder`
-  - `Sweet Gunpowder Biscuit`
-- Blue recolor groundwork for tamed creepers has been added
+- Weakening:
+  - requires wearing a `Creeper Head`
+  - uses the `Anti-Blast Biscuit`
+  - gives the creeper a continuous weakened particle effect
+  - prevents the normal suicide explosion behavior
+- Taming:
+  - uses the `Sweet Gunpowder Biscuit`
+  - stores the owner
+  - clears the weakened visual state once tamed
+- Companion behavior:
+  - follows the owner
+  - can be told to stay in place
+  - teleports back if left too far behind
+  - changes dimension with the owner
+  - resyncs to the owner after respawn
+- Combat:
+  - does not target players by default
+  - protects the owner from hostile mobs
+  - also attacks mobs the owner is attacking
+  - also keeps fighting mobs that retarget onto the creeper itself
+  - uses a small contact blast / shove attack instead of a real self-destruct explosion
+  - gets extra movement speed while fighting
+  - dies with a larger non-destructive blast burst
+- Health and healing:
+  - tamed creepers have increased max health
+  - owners can heal them with `Gunpowder`
+  - owners can heal them more with `Sweet Gunpowder Biscuit`
+- Visual customization:
+  - tamed creepers default to the `happy` green texture
+  - recolor options currently include `blue`, `cyan`, `gray`, `yellow`, `pink`, `purple`, `red`, `black`
+  - `Lime Dye` restores the default happy green texture
+  - `Rainbow Biscuit` enables rainbow mode
+  - rainbow mode cycles smoothly through the available colored creeper textures
+- Loot:
+  - `Rainbow Biscuit` can appear in generated structure chests
 
 ## Items
 
 - `Biscuit`
 - `Anti-Blast Biscuit`
 - `Sweet Gunpowder Biscuit`
+- `Rainbow Biscuit`
 
-The base `Biscuit` is edible. The two special biscuits are interaction items and are not edible by players.
+`Biscuit` is edible.
+
+`Anti-Blast Biscuit`, `Sweet Gunpowder Biscuit`, and `Rainbow Biscuit` are interaction items and are not edible by players.
 
 ## Recipes
 
 ### Biscuit
 
-Craft `2` biscuits with:
+Craft `2` biscuits from:
 
 ```text
 Wheat + Sugar + Wheat
 ```
 
-Placed horizontally in a crafting grid.
+Place the ingredients horizontally in a crafting grid.
 
 ### Sweet Gunpowder Biscuit
 
@@ -81,18 +102,24 @@ Craft with:
 Biscuit + Milk Bucket
 ```
 
-The milk bucket should return an empty bucket through normal vanilla crafting remainder behavior.
+The milk bucket returns an empty bucket after crafting.
 
-## Development Setup
+### Rainbow Biscuit
+
+There is currently no crafting recipe.
+
+It is found as loot in generated chests.
+
+## Development
 
 ### IntelliJ IDEA
 
-1. Open the project root in IntelliJ IDEA
-2. Ensure the project uses Java `21`
-3. Let Gradle import the NeoForge project
-4. Run the generated NeoForge client configuration
+1. Open the project root in IntelliJ IDEA.
+2. Make sure the project uses Java `21`.
+3. Let Gradle import the NeoForge project.
+4. Run the generated NeoForge client configuration.
 
-### Useful Commands
+### Commands
 
 ```powershell
 .\gradlew.bat runClient
@@ -109,32 +136,23 @@ If dependencies get out of sync:
 
 ### Reload Tips
 
-- Use `F3 + T` for textures, models, language files, and other resource changes
-- Use `/reload` for recipe and datapack-style resource changes
-- Restart the client for Java code changes
+- Use `F3 + T` for textures, models, language files, and other client assets.
+- Use `/reload` for recipes and loot-table style datapack resources.
+- Restart the game for Java code changes.
 
 ## Project Structure
 
 - [src/main/java/com/damian/happycreeper](/E:/McCode/happy-creeper/src/main/java/com/damian/happycreeper) contains the mod source
-- [src/main/resources](/E:/McCode/happy-creeper/src/main/resources) contains assets, recipes, and mod resources
+- [src/main/resources](/E:/McCode/happy-creeper/src/main/resources) contains assets, loot, recipes, and mod resources
+- [src/main/templates/META-INF/neoforge.mods.toml](/E:/McCode/happy-creeper/src/main/templates/META-INF/neoforge.mods.toml) contains mod metadata
 - [build.gradle](/E:/McCode/happy-creeper/build.gradle) contains the NeoForge build configuration
-- [gradle.properties](/E:/McCode/happy-creeper/gradle.properties) contains the Minecraft, NeoForge, and mod version settings
+- [gradle.properties](/E:/McCode/happy-creeper/gradle.properties) contains version and mod properties
 
-## Current Status
+## Release Status
 
-The core taming loop is implemented and playable:
+The current build is suitable for public alpha playtesting.
 
-- approach with a creeper head
-- weaken with an anti-blast biscuit
-- tame with a sweet gunpowder biscuit
-- command, heal, and fight alongside the creeper
-
-The main work left is polish, balance, visual upgrades, and extending customization such as recolors or future armor ideas.
-
-## Notes
-
-- The project uses Mojang mappings through the NeoForge toolchain
-- The mod is still in active development and balance values may change frequently
+The main gameplay loop is in place, but balance, visuals, and quality-of-life details are still being tuned.
 
 ## License
 
