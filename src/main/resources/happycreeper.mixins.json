@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.damian.happycreeper.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MobMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

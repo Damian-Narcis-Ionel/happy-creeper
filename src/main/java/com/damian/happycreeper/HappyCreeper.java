@@ -1,36 +1,22 @@
 package com.damian.happycreeper;
 
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(HappyCreeper.MODID)
 public class HappyCreeper {
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "happycreeper";
-    // Directly reference a slf4j logger
-    public static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Items which will all be registered under the "happycreeper" namespace
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MODID);
 
@@ -42,28 +28,12 @@ public class HappyCreeper {
     public static final DeferredItem<Item> FAKE_HAPPY_CREEPER_HEAD = ITEMS.register("fake_happy_creeper_head",
             () -> new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
 
-    // The constructor for the mod class is the first code that is run when your mod is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
-    public HappyCreeper(IEventBus modEventBus, ModContainer modContainer) {
+    public HappyCreeper(IEventBus modEventBus) {
         TamedCreeperAppearance.init();
 
-        // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
-
-        // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
         ATTACHMENTS.register(modEventBus);
-
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (HappyCreeper) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
-        NeoForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
-    }
-
-    private void commonSetup(FMLCommonSetupEvent event) {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -81,10 +51,5 @@ public class HappyCreeper {
 
     public static boolean isCreeperDisguise(ItemStack stack) {
         return stack.is(Items.CREEPER_HEAD) || stack.is(FAKE_HAPPY_CREEPER_HEAD.get());
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
     }
 }
