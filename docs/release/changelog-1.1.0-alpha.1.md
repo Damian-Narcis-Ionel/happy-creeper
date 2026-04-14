@@ -16,6 +16,7 @@ Second public alpha release.
 - Direct potion feeding is limited to normal potions only
 - Splash and lingering potions are now handled through normal vanilla area effects instead of direct feeding
 - Armor management now supports both helmet and chestplate swapping and removal
+- Biscuit crafting now uses the new cross-shaped wheat recipe with sugar in the center
 
 ## Fixed
 
