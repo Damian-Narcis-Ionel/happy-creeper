@@ -24,11 +24,8 @@
   "message.happycreeper.creeper_recolored_black": "Your creeper is now black.",
   "message.happycreeper.creeper_staying": "Your creeper will stay here.",
   "message.happycreeper.creeper_following": "Your creeper is following you again.",
-  "happycreeper.configuration.title": "Happy Creeper Configs",
-  "happycreeper.configuration.section.happycreeper.common.toml": "Happy Creeper Configs",
-  "happycreeper.configuration.section.happycreeper.common.toml.title": "Happy Creeper Configs",
-  "happycreeper.configuration.items": "Item List",
-  "happycreeper.configuration.logDirtBlock": "Log Dirt Block",
-  "happycreeper.configuration.magicNumberIntroduction": "Magic Number Text",
-  "happycreeper.configuration.magicNumber": "Magic Number"
+  "message.happycreeper.creeper_equipped_armor": "Your creeper equipped that armor piece.",
+  "message.happycreeper.creeper_removed_armor": "You removed one of your creeper's armor pieces.",
+  "message.happycreeper.creeper_drank_potion": "Your creeper drank the potion.",
+  "message.happycreeper.potion_no_effect": "That potion has no effect to apply."
 }
