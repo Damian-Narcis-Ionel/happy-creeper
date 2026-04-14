@@ -48,9 +48,9 @@ This mod is built around survival-friendly mechanics rather than creative-only g
 
 ## Current Release Notes
 
-This release is intended as an alpha playtest build.
+This release is intended as a beta playtest build.
 
-The full taming loop is implemented and playable, but balance and polish are still in progress.
+The full taming loop is implemented and playable, with companion armor, potion support, and a wider set of survival-ready features in place. Balance and polish are still in progress.
 
 ## Requirements
 

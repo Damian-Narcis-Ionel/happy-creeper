@@ -1,6 +1,6 @@
-# Happy Creeper 1.1.0-alpha.1
+# Happy Creeper 1.1.0-beta.1
 
-Second public alpha release.
+Second public release and first beta build.
 
 ## Added
 
@@ -26,6 +26,6 @@ Second public alpha release.
 
 ## Notes
 
-- This is still an alpha build intended for public playtesting
+- This is a beta build intended for wider public playtesting
 - Existing worlds should continue to work
 - Old armor normalization modifiers from previous test builds are cleaned up automatically
