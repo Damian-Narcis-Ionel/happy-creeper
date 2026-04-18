@@ -8,6 +8,7 @@
   "message.happycreeper.need_to_weaken_first": "You need to weaken this creeper first.",
   "message.happycreeper.need_creeper_head": "You must wear a creeper head or a Happy Creeper Mask to weaken this creeper.",
   "message.happycreeper.already_tamed": "This creeper is already your friend.",
+  "message.happycreeper.already_same_color": "Your creeper already has that color.",
   "message.happycreeper.already_full_health": "Your creeper is already at full health.",
   "message.happycreeper.creeper_weakened": "The creeper has been weakened.",
   "message.happycreeper.creeper_tamed": "The creeper is now your friend.",
@@ -27,5 +28,12 @@
   "message.happycreeper.creeper_equipped_armor": "Your creeper equipped that armor piece.",
   "message.happycreeper.creeper_removed_armor": "You removed one of your creeper's armor pieces.",
   "message.happycreeper.creeper_drank_potion": "Your creeper drank the potion.",
-  "message.happycreeper.potion_no_effect": "That potion has no effect to apply."
+  "message.happycreeper.potion_no_effect": "That potion has no effect to apply.",
+  "screen.happycreeper.creeper.title": "Happy Creeper",
+  "screen.happycreeper.creeper.armor": "Armor",
+  "screen.happycreeper.creeper.health": "%s/%s",
+  "screen.happycreeper.creeper.fuel": "Fuel",
+  "screen.happycreeper.creeper.effect_duration": "Time: %s",
+  "screen.happycreeper.creeper.command.staying": "Staying",
+  "screen.happycreeper.creeper.command.following": "Following"
 }

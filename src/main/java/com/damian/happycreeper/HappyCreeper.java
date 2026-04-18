@@ -1,13 +1,17 @@
 package com.damian.happycreeper;
 
+import com.damian.happycreeper.menu.CreeperMenu;
+
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -18,6 +22,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 public class HappyCreeper {
     public static final String MODID = "happycreeper";
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
+    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(net.minecraft.core.registries.BuiltInRegistries.MENU, MODID);
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MODID);
 
     public static final DeferredItem<Item> BISCUIT = ITEMS.registerSimpleItem("biscuit",
@@ -27,11 +32,15 @@ public class HappyCreeper {
     public static final DeferredItem<Item> RAINBOW_BISCUIT = ITEMS.registerSimpleItem("rainbow_biscuit", new Item.Properties());
     public static final DeferredItem<Item> FAKE_HAPPY_CREEPER_HEAD = ITEMS.register("fake_happy_creeper_head",
             () -> new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<MenuType<?>, MenuType<CreeperMenu>> CREEPER_MENU = MENUS.register(
+            "creeper_menu",
+            () -> IMenuTypeExtension.create((windowId, inventory, extraData) -> new CreeperMenu(windowId, inventory, extraData.readInt())));
 
     public HappyCreeper(IEventBus modEventBus) {
         TamedCreeperAppearance.init();
 
         ITEMS.register(modEventBus);
+        MENUS.register(modEventBus);
         ATTACHMENTS.register(modEventBus);
         modEventBus.addListener(this::addCreative);
     }
