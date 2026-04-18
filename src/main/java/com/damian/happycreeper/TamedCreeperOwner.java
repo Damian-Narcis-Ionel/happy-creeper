@@ -3,9 +3,9 @@ package com.damian.happycreeper;
 import java.util.Optional;
 import java.util.UUID;
 
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
@@ -17,16 +17,12 @@ public final class TamedCreeperOwner {
     }
 
     public static void setOwner(Creeper creeper, UUID ownerUuid) {
-        creeper.getPersistentData().putUUID(OWNER_UUID_TAG, ownerUuid);
+        creeper.getPersistentData().store(OWNER_UUID_TAG, UUIDUtil.CODEC, ownerUuid);
     }
 
     public static Optional<UUID> getOwnerUuid(Creeper creeper) {
         CompoundTag data = creeper.getPersistentData();
-        if (!data.hasUUID(OWNER_UUID_TAG)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(data.getUUID(OWNER_UUID_TAG));
+        return data.read(OWNER_UUID_TAG, UUIDUtil.CODEC);
     }
 
     public static boolean hasOwner(Creeper creeper) {

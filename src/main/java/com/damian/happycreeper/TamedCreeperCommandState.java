@@ -10,7 +10,7 @@ public final class TamedCreeperCommandState {
     }
 
     public static boolean isStaying(Creeper creeper) {
-        return creeper.getPersistentData().getBoolean(STAYING_TAG);
+        return creeper.getPersistentData().getBooleanOr(STAYING_TAG, false);
     }
 
     public static void setStaying(Creeper creeper, boolean staying) {

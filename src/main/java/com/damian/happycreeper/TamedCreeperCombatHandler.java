@@ -53,7 +53,7 @@ public final class TamedCreeperCombatHandler {
         }
 
         CompoundTag data = creeper.getPersistentData();
-        int cooldown = data.getInt(BLAST_COOLDOWN_TAG);
+        int cooldown = data.getIntOr(BLAST_COOLDOWN_TAG, 0);
         if (cooldown > 0) {
             data.putInt(BLAST_COOLDOWN_TAG, cooldown - 1);
         }

@@ -2,6 +2,7 @@ package com.damian.happycreeper;
 
 import java.util.UUID;
 
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -89,7 +90,7 @@ public final class CreeperHeadProtectionHandler {
 
     private static void setRevengeTarget(Creeper creeper, Player player) {
         CompoundTag data = creeper.getPersistentData();
-        data.putUUID(REVENGE_TARGET_TAG, player.getUUID());
+        data.store(REVENGE_TARGET_TAG, UUIDUtil.CODEC, player.getUUID());
         data.putInt(REVENGE_TICKS_TAG, REVENGE_DURATION_TICKS);
     }
 
@@ -99,17 +100,18 @@ public final class CreeperHeadProtectionHandler {
         }
 
         CompoundTag data = creeper.getPersistentData();
-        if (!data.hasUUID(REVENGE_TARGET_TAG) || data.getInt(REVENGE_TICKS_TAG) <= 0) {
+        if (data.getIntOr(REVENGE_TICKS_TAG, 0) <= 0) {
             return false;
         }
 
-        UUID revengeTarget = data.getUUID(REVENGE_TARGET_TAG);
-        return revengeTarget.equals(player.getUUID());
+        return data.read(REVENGE_TARGET_TAG, UUIDUtil.CODEC)
+                .map(revengeTarget -> revengeTarget.equals(player.getUUID()))
+                .orElse(false);
     }
 
     private static void tickRevengeTimer(Creeper creeper) {
         CompoundTag data = creeper.getPersistentData();
-        int remainingTicks = data.getInt(REVENGE_TICKS_TAG);
+        int remainingTicks = data.getIntOr(REVENGE_TICKS_TAG, 0);
         if (remainingTicks <= 0) {
             clearRevengeTarget(data);
             return;

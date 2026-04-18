@@ -16,11 +16,9 @@ public final class CreeperFuelStorage {
 
     public static ItemStack getFuelStack(Creeper creeper) {
         CompoundTag data = creeper.getPersistentData();
-        if (!data.contains(FUEL_STACK_TAG, Tag.TAG_COMPOUND)) {
-            return ItemStack.EMPTY;
-        }
-
-        return ItemStack.parseOptional(creeper.level().registryAccess(), data.getCompound(FUEL_STACK_TAG));
+        return data.getCompound(FUEL_STACK_TAG)
+                .flatMap(tag -> ItemStack.parse(creeper.level().registryAccess(), tag))
+                .orElse(ItemStack.EMPTY);
     }
 
     public static void setFuelStack(Creeper creeper, ItemStack stack) {
@@ -30,7 +28,7 @@ public final class CreeperFuelStorage {
             return;
         }
 
-        Tag saved = stack.saveOptional(creeper.level().registryAccess());
+        Tag saved = stack.save(creeper.level().registryAccess());
         if (saved instanceof CompoundTag compoundTag) {
             data.put(FUEL_STACK_TAG, compoundTag);
         }

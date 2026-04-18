@@ -5,6 +5,7 @@ import com.damian.happycreeper.CreeperState;
 import com.damian.happycreeper.HappyCreeper;
 import com.damian.happycreeper.TamedCreeperCommandState;
 import com.damian.happycreeper.TamedCreeperOwner;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
@@ -18,7 +19,6 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
 
@@ -202,12 +202,16 @@ public class CreeperMenu extends AbstractContainerMenu {
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        if (!(stack.getItem() instanceof ArmorItem)) {
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        if (equippable == null || equippable.slot() != slot) {
             return false;
         }
 
-        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-        return equippable != null && equippable.slot() == slot;
+        return switch (slot) {
+            case HEAD -> stack.is(ItemTags.HEAD_ARMOR);
+            case CHEST -> stack.is(ItemTags.CHEST_ARMOR);
+            default -> false;
+        };
     }
 
     private static Creeper getCreeper(Inventory playerInventory, int creeperId) {

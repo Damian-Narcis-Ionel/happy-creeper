@@ -35,7 +35,7 @@ public final class WeakenedCreeperExplosionHandler {
         }
 
         CompoundTag data = creeper.getPersistentData();
-        int cooldown = data.getInt(FIZZLE_COOLDOWN_TAG);
+        int cooldown = data.getIntOr(FIZZLE_COOLDOWN_TAG, 0);
         if (cooldown > 0) {
             data.putInt(FIZZLE_COOLDOWN_TAG, cooldown - 1);
             creeper.setSwellDir(-1);

@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,7 +13,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
@@ -318,12 +318,16 @@ public final class CreeperInteractionHandler {
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        if (!(stack.getItem() instanceof ArmorItem)) {
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        if (equippable == null || equippable.slot() != slot) {
             return false;
         }
 
-        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-        return equippable != null && equippable.slot() == slot;
+        return switch (slot) {
+            case HEAD -> stack.is(ItemTags.HEAD_ARMOR);
+            case CHEST -> stack.is(ItemTags.CHEST_ARMOR);
+            default -> false;
+        };
     }
 
     private static boolean isPotionItem(ItemStack stack) {
@@ -335,7 +339,7 @@ public final class CreeperInteractionHandler {
         potionContents.forEachEffect(effect -> {
             applyPotionEffect(player, creeper, effect);
             applied[0] = true;
-        });
+        }, 1.0F);
 
         if (!applied[0]) {
             player.displayClientMessage(Component.translatable("message.happycreeper.potion_no_effect")
