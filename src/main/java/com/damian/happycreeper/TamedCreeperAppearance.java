@@ -35,7 +35,7 @@ public final class TamedCreeperAppearance {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> COLOR_VARIANT = HappyCreeper.ATTACHMENTS.register(
             "color_variant",
             () -> AttachmentType.builder(() -> NONE_VARIANT)
-                    .serialize(Codec.INT)
+                    .serialize(Codec.INT.fieldOf("value"))
                     .build());
 
     public static int getVariant(Creeper creeper) {

@@ -1,12 +1,12 @@
 # Happy Creeper
 
-`Happy Creeper` is a NeoForge mod for Minecraft `1.21.5` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
+`Happy Creeper` is a NeoForge mod for Minecraft `1.21.6` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
 
 The mod is being developed for actual survival play, so the mechanics are meant to feel usable in a normal world and modpack, not just in a test map.
 
 ## Platform
 
-- Minecraft: `1.21.5`
+- Minecraft: `1.21.6`
 - Loader: `NeoForge`
 - Java: `21`
 
@@ -185,7 +185,7 @@ If dependencies get out of sync:
 
 ## Release Status
 
-The current build is suitable for public beta playtesting on Minecraft `1.21.5`.
+The current build is suitable for public beta playtesting on Minecraft `1.21.6`.
 
 The main taming loop, companion UI, armor system, recolor flow, potion support, and fuel-based self-healing are all playable. Balance and polish are still being tuned.
 

@@ -3,7 +3,7 @@
   "package": "com.damian.happycreeper.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "EntityMixin",
+    "LeashableMixin",
     "MobMixin"
   ],
   "injectors": {

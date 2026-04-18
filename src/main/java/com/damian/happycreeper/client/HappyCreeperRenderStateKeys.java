@@ -13,6 +13,8 @@ public final class HappyCreeperRenderStateKeys {
             ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_helmet"));
     public static final ContextKey<ItemStack> CREEPER_CHESTPLATE = new ContextKey<>(
             ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_chestplate"));
+    public static final ContextKey<ItemStack> PLAYER_HEAD_ITEM = new ContextKey<>(
+            ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "player_head_item"));
 
     private HappyCreeperRenderStateKeys() {
     }

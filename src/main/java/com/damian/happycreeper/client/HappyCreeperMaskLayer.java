@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.SkullBlock;
 
 public final class HappyCreeperMaskLayer extends RenderLayer<PlayerRenderState, PlayerModel> {
@@ -30,14 +31,15 @@ public final class HappyCreeperMaskLayer extends RenderLayer<PlayerRenderState, 
             PlayerRenderState renderState,
             float yRot,
             float xRot) {
-        if (renderState.isInvisible || this.creeperHeadModel == null || !renderState.headEquipment.is(HappyCreeper.FAKE_HAPPY_CREEPER_HEAD.get())) {
+        ItemStack headStack = renderState.getRenderData(HappyCreeperRenderStateKeys.PLAYER_HEAD_ITEM);
+        if (renderState.isInvisible || this.creeperHeadModel == null || headStack == null || !headStack.is(HappyCreeper.FAKE_HAPPY_CREEPER_HEAD.get())) {
             return;
         }
 
         poseStack.pushPose();
         getParentModel().root().translateAndRotate(poseStack);
         getParentModel().head.translateAndRotate(poseStack);
-        poseStack.scale(1.22F, -1.22F, -1.22F);
+        poseStack.scale(1.1875F, -1.1875F, -1.1875F);
         poseStack.translate(-0.5F, 0.0F, -0.5F);
         SkullBlockRenderer.renderSkull(
                 null,
@@ -47,7 +49,7 @@ public final class HappyCreeperMaskLayer extends RenderLayer<PlayerRenderState, 
                 bufferSource,
                 packedLight,
                 this.creeperHeadModel,
-                SkullBlockRenderer.getRenderType(SkullBlock.Types.CREEPER, null, MASK_TEXTURE));
+                SkullBlockRenderer.getSkullRenderType(SkullBlock.Types.CREEPER, MASK_TEXTURE));
         poseStack.popPose();
     }
 }

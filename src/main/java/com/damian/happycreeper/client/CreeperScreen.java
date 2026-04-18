@@ -5,13 +5,14 @@ import com.damian.happycreeper.menu.CreeperMenu;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -41,6 +42,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
     private static final int HEART_ICON_Y = 63;
     private static final int HEART_ICON_SIZE = 9;
     private static final int HEALTH_TEXT_X = 22;
+    private static final int LABEL_COLOR = 0xFF404040;
     private static final int FUEL_SLOT_X = 30;
     private static final int FUEL_SLOT_Y = 41;
     private static final int FUEL_LABEL_X = 30;
@@ -90,21 +92,17 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
         commandButton.setMessage(getCommandLabel());
         Creeper creeper = menu.getCreeper();
         Component screenTitle = creeper != null && creeper.hasCustomName() ? creeper.getDisplayName() : title;
-        guiGraphics.drawString(font, screenTitle, 8, TITLE_Y, 0x404040, false);
-        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x404040, false);
+        guiGraphics.drawString(font, screenTitle, 8, TITLE_Y, LABEL_COLOR, false);
+        guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, LABEL_COLOR, false);
 
         if (creeper == null) {
             return;
         }
 
-        guiGraphics.blitSprite(RenderType::guiTextured, HEART_SPRITE, HEART_ICON_X, HEART_ICON_Y, HEART_ICON_SIZE, HEART_ICON_SIZE);
-        guiGraphics.drawString(font,
-                Component.translatable("screen.happycreeper.creeper.health", menu.getDisplayedHealth(), menu.getDisplayedMaxHealth()),
-                HEALTH_TEXT_X,
-                HEALTH_VALUE_Y,
-                0x404040,
-                false);
-        guiGraphics.drawString(font, Component.translatable("screen.happycreeper.creeper.fuel"), FUEL_LABEL_X, FUEL_LABEL_Y, 0x404040, false);
+        String healthText = menu.getDisplayedHealth() + "/" + menu.getDisplayedMaxHealth();
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, HEART_SPRITE, HEART_ICON_X, HEART_ICON_Y, HEART_ICON_SIZE, HEART_ICON_SIZE);
+        guiGraphics.drawString(font, healthText, HEALTH_TEXT_X, HEALTH_VALUE_Y, LABEL_COLOR, false);
+        guiGraphics.drawString(font, Component.translatable("screen.happycreeper.creeper.fuel"), FUEL_LABEL_X, FUEL_LABEL_Y, LABEL_COLOR, false);
     }
 
     private Component getCommandLabel() {
@@ -129,7 +127,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
     }
 
     private static void renderSlot(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.blitSprite(RenderType::guiTextured, SLOT_SPRITE, x, y, 18, 18);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_SPRITE, x, y, 18, 18);
     }
 
     @Override
@@ -141,7 +139,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
         renderSlot(guiGraphics, left + ARMOR_SLOT_X, top + HELMET_SLOT_Y);
         renderSlot(guiGraphics, left + ARMOR_SLOT_X, top + CHESTPLATE_SLOT_Y);
         renderSlot(guiGraphics, left + FUEL_SLOT_X, top + FUEL_SLOT_Y);
-        guiGraphics.blit(RenderType::guiTextured, INVENTORY_TEXTURE, left, top + INVENTORY_SECTION_Y, 0.0F, (float) INVENTORY_SECTION_Y, imageWidth, INVENTORY_SECTION_HEIGHT, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, INVENTORY_TEXTURE, left, top + INVENTORY_SECTION_Y, 0.0F, (float) INVENTORY_SECTION_Y, imageWidth, INVENTORY_SECTION_HEIGHT, 256, 256);
         renderEffects(guiGraphics, left, top);
 
         Creeper creeper = menu.getCreeper();
@@ -171,9 +169,8 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
         int y = top + EFFECT_Y;
         for (int i = 0; i < effects.size(); i++) {
             MobEffectInstance effect = effects.get(i);
-            guiGraphics.blitSprite(RenderType::guiTextured, EFFECT_BACKGROUND_SMALL_SPRITE, x, y + i * EFFECT_SPACING, 32, 32);
-            TextureAtlasSprite sprite = minecraft.getMobEffectTextures().get(effect.getEffect());
-            guiGraphics.blitSprite(RenderType::guiTextured, sprite, x + 7, y + 7 + i * EFFECT_SPACING, 18, 18);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, EFFECT_BACKGROUND_SMALL_SPRITE, x, y + i * EFFECT_SPACING, 32, 32);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, Gui.getMobEffectSprite(effect.getEffect()), x + 7, y + 7 + i * EFFECT_SPACING, 18, 18);
         }
     }
 
@@ -192,7 +189,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
                 MobEffectInstance effect = effects.get(i);
                 List<Component> tooltip = new ArrayList<>();
                 tooltip.add(Component.translatable(effect.getDescriptionId()));
-                guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(font, tooltip, Optional.empty(), mouseX, mouseY);
                 return;
             }
         }

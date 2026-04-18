@@ -1,10 +1,10 @@
 # Happy Creeper 1.2.0-beta.1
 
-Public beta build for NeoForge on Minecraft 1.21.5.
+Public beta build for NeoForge on Minecraft 1.21.6.
 
 ## Added
 
-- Minecraft 1.21.5 NeoForge port of the current Happy Creeper beta feature set
+- Minecraft 1.21.6 NeoForge port of the current Happy Creeper beta feature set
 - Dedicated companion UI for tamed creepers
 - 3D creeper preview in the companion UI
 - Helmet and chestplate management directly in the UI
@@ -29,6 +29,7 @@ Public beta build for NeoForge on Minecraft 1.21.5.
 
 ## Fixed
 
+- Companion UI labels now render correctly on Minecraft `1.21.6`, including the creeper name, inventory text, fuel label, and health value
 - Fuel slot interaction no longer causes the UI health display to fall back to stale `20 HP` max health values
 - Reusing the same dye on a creeper that already has that color no longer consumes the dye
 - Reusing a Rainbow Biscuit on an already-rainbow creeper no longer wastes the item
@@ -37,5 +38,5 @@ Public beta build for NeoForge on Minecraft 1.21.5.
 ## Notes
 
 - This is a beta build intended for broader playtesting, not a final release
-- This file targets Minecraft `1.21.5` on NeoForge
+- This file targets Minecraft `1.21.6` on NeoForge
 - The companion UI is now the primary place for armor and fuel management

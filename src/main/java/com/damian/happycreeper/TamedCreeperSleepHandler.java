@@ -27,7 +27,7 @@ public final class TamedCreeperSleepHandler {
         AABB checkArea = new AABB(bedPos).inflate(BED_MONSTER_CHECK_RADIUS);
 
         boolean hasRealThreat = player.level()
-                .getEntitiesOfClass(Monster.class, checkArea, monster -> monster.isAlive() && monster.isPreventingPlayerRest(player.serverLevel(), player))
+                .getEntitiesOfClass(Monster.class, checkArea, monster -> monster.isAlive() && monster.isPreventingPlayerRest(player.level(), player))
                 .stream()
                 .anyMatch(monster -> !(monster instanceof net.minecraft.world.entity.monster.Creeper creeper)
                         || CreeperState.get(creeper) != CreeperState.TAMED);
