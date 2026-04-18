@@ -1,90 +1,53 @@
 package com.damian.happycreeper.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.model.CreeperModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.core.Holder;
+import net.minecraft.client.renderer.entity.state.CreeperRenderState;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
-import net.neoforged.neoforge.client.ClientHooks;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.minecraft.world.item.equipment.Equippable;
 
-public final class CreeperHelmetLayer extends RenderLayer<Creeper, CreeperModel<Creeper>> {
+public final class CreeperHelmetLayer extends RenderLayer<CreeperRenderState, CreeperModel> {
     private final CreeperHelmetModel model;
-    private final TextureAtlas armorTrimAtlas;
+    private final EquipmentLayerRenderer equipmentRenderer;
 
-    public CreeperHelmetLayer(RenderLayerParent<Creeper, CreeperModel<Creeper>> renderer,
+    public CreeperHelmetLayer(RenderLayerParent<CreeperRenderState, CreeperModel> renderer,
             EntityModelSet modelSet,
-            ModelManager modelManager) {
+            EquipmentLayerRenderer equipmentRenderer) {
         super(renderer);
         this.model = new CreeperHelmetModel(modelSet.bakeLayer(CreeperHelmetModel.LAYER_LOCATION));
-        this.armorTrimAtlas = modelManager.getAtlas(Sheets.ARMOR_TRIMS_SHEET);
+        this.equipmentRenderer = equipmentRenderer;
     }
 
     @Override
     public void render(PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight,
-            Creeper creeper,
-            float limbSwing,
-            float limbSwingAmount,
-            float partialTick,
-            float ageInTicks,
-            float netHeadYaw,
-            float headPitch) {
-        ItemStack helmet = creeper.getItemBySlot(EquipmentSlot.HEAD);
-        if (!(helmet.getItem() instanceof ArmorItem armorItem) || armorItem.getEquipmentSlot() != EquipmentSlot.HEAD) {
+            CreeperRenderState renderState,
+            float yRot,
+            float xRot) {
+        ItemStack helmet = renderState.getRenderDataOrDefault(HappyCreeperRenderStateKeys.CREEPER_HELMET, ItemStack.EMPTY);
+        Equippable equippable = helmet.get(DataComponents.EQUIPPABLE);
+        if (equippable == null || equippable.slot() != EquipmentSlot.HEAD || equippable.assetId().isEmpty()) {
             return;
         }
 
-        this.model.setupAnim(creeper, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-
-        IClientItemExtensions extensions = IClientItemExtensions.of(helmet);
-        extensions.setupModelAnimations(creeper, helmet, EquipmentSlot.HEAD, this.model, limbSwing, limbSwingAmount, partialTick, ageInTicks, netHeadYaw, headPitch);
-
-        int overlay = LivingEntityRenderer.getOverlayCoords(creeper, 0.0F);
-        int fallbackColor = extensions.getDefaultDyeColor(helmet);
-        Holder<ArmorMaterial> armorMaterial = armorItem.getMaterial();
-
-        for (int layerIndex = 0; layerIndex < armorMaterial.value().layers().size(); layerIndex++) {
-            ArmorMaterial.Layer armorLayer = armorMaterial.value().layers().get(layerIndex);
-            int color = extensions.getArmorLayerTintColor(helmet, creeper, armorLayer, layerIndex, fallbackColor);
-            if (color == 0) {
-                continue;
-            }
-
-            ResourceLocation texture = ClientHooks.getArmorTexture(creeper, helmet, armorLayer, false, EquipmentSlot.HEAD);
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.armorCutoutNoCull(texture));
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, overlay, color);
-        }
-
-        ArmorTrim trim = helmet.get(DataComponents.TRIM);
-        if (trim != null) {
-            TextureAtlasSprite trimSprite = this.armorTrimAtlas.getSprite(trim.outerTexture(armorMaterial));
-            VertexConsumer vertexConsumer = trimSprite.wrap(bufferSource.getBuffer(Sheets.armorTrimsSheet(trim.pattern().value().decal())));
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
-        }
-
-        if (helmet.hasFoil()) {
-            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.armorEntityGlint()), packedLight, OverlayTexture.NO_OVERLAY);
-        }
+        this.model.setupAnim(renderState);
+        this.equipmentRenderer.renderLayers(
+                EquipmentClientInfo.LayerType.HUMANOID,
+                equippable.assetId().orElseThrow(),
+                this.model,
+                helmet,
+                poseStack,
+                bufferSource,
+                packedLight);
     }
 }

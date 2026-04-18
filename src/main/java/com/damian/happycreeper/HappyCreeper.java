@@ -3,6 +3,7 @@ package com.damian.happycreeper;
 import com.damian.happycreeper.menu.CreeperMenu;
 
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,8 +31,10 @@ public class HappyCreeper {
     public static final DeferredItem<Item> ANTI_BLAST_BISCUIT = ITEMS.registerSimpleItem("anti_blast_biscuit", new Item.Properties());
     public static final DeferredItem<Item> SWEET_GUNPOWDER_BISCUIT = ITEMS.registerSimpleItem("sweet_gunpowder_biscuit", new Item.Properties());
     public static final DeferredItem<Item> RAINBOW_BISCUIT = ITEMS.registerSimpleItem("rainbow_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> FAKE_HAPPY_CREEPER_HEAD = ITEMS.register("fake_happy_creeper_head",
-            () -> new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<FakeCreeperHeadItem> FAKE_HAPPY_CREEPER_HEAD = ITEMS.registerItem(
+            "fake_happy_creeper_head",
+            FakeCreeperHeadItem::new,
+            new Item.Properties().stacksTo(1).equippable(EquipmentSlot.HEAD));
     public static final DeferredHolder<MenuType<?>, MenuType<CreeperMenu>> CREEPER_MENU = MENUS.register(
             "creeper_menu",
             () -> IMenuTypeExtension.create((windowId, inventory, extraData) -> new CreeperMenu(windowId, inventory, extraData.readInt())));
@@ -43,6 +46,7 @@ public class HappyCreeper {
         MENUS.register(modEventBus);
         ATTACHMENTS.register(modEventBus);
         modEventBus.addListener(this::addCreative);
+        modEventBus.addListener(HappyCreeperNetwork::onRegisterPayloadHandlers);
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {

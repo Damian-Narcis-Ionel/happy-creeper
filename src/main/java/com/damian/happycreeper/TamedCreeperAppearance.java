@@ -2,11 +2,12 @@ package com.damian.happycreeper;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -35,7 +36,6 @@ public final class TamedCreeperAppearance {
             "color_variant",
             () -> AttachmentType.builder(() -> NONE_VARIANT)
                     .serialize(Codec.INT)
-                    .sync(ByteBufCodecs.VAR_INT)
                     .build());
 
     public static int getVariant(Creeper creeper) {
@@ -44,7 +44,9 @@ public final class TamedCreeperAppearance {
 
     public static void setVariant(Creeper creeper, int variant) {
         creeper.setData(COLOR_VARIANT.get(), variant);
-        creeper.syncData(COLOR_VARIANT.get());
+        if (!creeper.level().isClientSide()) {
+            HappyCreeperNetwork.syncAppearance(creeper, variant);
+        }
     }
 
     public static void ensureTamedAppearance(Creeper creeper) {
@@ -58,5 +60,14 @@ public final class TamedCreeperAppearance {
         if (event.getEntity() instanceof Creeper creeper && !creeper.level().isClientSide()) {
             ensureTamedAppearance(creeper);
         }
+    }
+
+    @SubscribeEvent
+    public static void onStartTracking(PlayerEvent.StartTracking event) {
+        if (!(event.getEntity() instanceof ServerPlayer player) || !(event.getTarget() instanceof Creeper creeper)) {
+            return;
+        }
+
+        HappyCreeperNetwork.syncAppearanceToPlayer(player, creeper, getVariant(creeper));
     }
 }

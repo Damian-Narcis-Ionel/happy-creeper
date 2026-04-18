@@ -6,18 +6,23 @@ import com.damian.happycreeper.client.CreeperHelmetLayer;
 import com.damian.happycreeper.client.CreeperHelmetModel;
 import com.damian.happycreeper.client.CreeperScreen;
 import com.damian.happycreeper.client.CreeperVariantTextureLayer;
+import com.damian.happycreeper.client.HappyCreeperRenderStateKeys;
 import com.damian.happycreeper.client.HappyCreeperMaskLayer;
 
 import net.minecraft.client.renderer.entity.CreeperRenderer;
+import net.minecraft.client.renderer.entity.state.CreeperRenderState;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.monster.Creeper;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 
 @Mod(value = HappyCreeper.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = HappyCreeper.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
@@ -33,8 +38,8 @@ public class HappyCreeperClient {
         CreeperRenderer creeperRenderer = event.getRenderer(EntityType.CREEPER);
         if (creeperRenderer != null) {
             creeperRenderer.addLayer(new CreeperVariantTextureLayer(creeperRenderer));
-            creeperRenderer.addLayer(new CreeperHelmetLayer(creeperRenderer, event.getEntityModels(), event.getContext().getModelManager()));
-            creeperRenderer.addLayer(new CreeperChestplateLayer(creeperRenderer, event.getEntityModels(), event.getContext().getModelManager()));
+            creeperRenderer.addLayer(new CreeperHelmetLayer(creeperRenderer, event.getEntityModels(), event.getContext().getEquipmentRenderer()));
+            creeperRenderer.addLayer(new CreeperChestplateLayer(creeperRenderer, event.getEntityModels(), event.getContext().getEquipmentRenderer()));
         }
 
         for (PlayerSkin.Model skinModel : event.getSkins()) {
@@ -48,5 +53,14 @@ public class HappyCreeperClient {
     @SubscribeEvent
     static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
         event.register(HappyCreeper.CREEPER_MENU.get(), CreeperScreen::new);
+    }
+
+    @SubscribeEvent
+    static void onRegisterRenderStateModifiers(RegisterRenderStateModifiersEvent event) {
+        event.registerEntityModifier(CreeperRenderer.class, (Creeper creeper, CreeperRenderState renderState) -> {
+            renderState.setRenderData(HappyCreeperRenderStateKeys.CREEPER_VARIANT, TamedCreeperAppearance.getVariant(creeper));
+            renderState.setRenderData(HappyCreeperRenderStateKeys.CREEPER_HELMET, creeper.getItemBySlot(EquipmentSlot.HEAD).copy());
+            renderState.setRenderData(HappyCreeperRenderStateKeys.CREEPER_CHESTPLATE, creeper.getItemBySlot(EquipmentSlot.CHEST).copy());
+        });
     }
 }
