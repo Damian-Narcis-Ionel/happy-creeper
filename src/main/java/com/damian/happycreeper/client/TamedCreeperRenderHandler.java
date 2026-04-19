@@ -22,7 +22,8 @@ public final class TamedCreeperRenderHandler {
             return;
         }
 
-        if (CreeperState.get(creeper) != CreeperState.TAMED || !TamedCreeperAppearance.isBlue(creeper)) {
+        if (CreeperState.get(creeper) != CreeperState.TAMED
+                || TamedCreeperAppearance.getVariant(creeper) != TamedCreeperAppearance.BLUE_VARIANT) {
             return;
         }
 
