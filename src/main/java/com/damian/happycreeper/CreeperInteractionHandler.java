@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.SimpleMenuProvider;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -44,12 +46,10 @@ public final class CreeperInteractionHandler {
         boolean isHelmet = isArmorItemForSlot(stack, EquipmentSlot.HEAD);
         boolean isArmorPiece = isChestplate || isHelmet;
         boolean isPotion = isPotionItem(stack);
-        boolean isRemovingArmor = player.isShiftKeyDown()
-                && stack.isEmpty()
-                && getRemovableArmorSlot(creeper) != null;
+        boolean isShiftEmptyHand = player.isShiftKeyDown() && stack.isEmpty();
         if (level.isClientSide()) {
             boolean looksTamed = TamedCreeperAppearance.getVariant(creeper) != TamedCreeperAppearance.NONE_VARIANT;
-            if (looksTamed && (stack.is(Items.LEAD) || isArmorPiece || isPotion || isRemovingArmor)) {
+            if (looksTamed && (stack.is(Items.LEAD) || isArmorPiece || isPotion || isShiftEmptyHand)) {
                 event.setCancellationResult(InteractionResult.SUCCESS);
                 event.setCanceled(true);
             }
@@ -138,36 +138,7 @@ public final class CreeperInteractionHandler {
                 return;
             }
 
-            EquipmentSlot armorSlot = isChestplate ? EquipmentSlot.CHEST : EquipmentSlot.HEAD;
-            equipArmorPiece(player, creeper, stack, hand, armorSlot);
-            player.displayClientMessage(Component.translatable("message.happycreeper.creeper_equipped_armor")
-                    .withStyle(ChatFormatting.GREEN), true);
-            event.setCanceled(true);
-            return;
-        }
-
-        if (isRemovingArmor) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
-            if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
-            }
-
-            EquipmentSlot removableArmorSlot = getRemovableArmorSlot(creeper);
-            if (removableArmorSlot == null) {
-                return;
-            }
-
-            ItemStack equippedArmor = creeper.getItemBySlot(removableArmorSlot).copy();
-            creeper.setItemSlot(removableArmorSlot, ItemStack.EMPTY);
-            player.setItemInHand(hand, equippedArmor);
-            player.displayClientMessage(Component.translatable("message.happycreeper.creeper_removed_armor")
-                    .withStyle(ChatFormatting.GREEN), true);
+            openCreeperMenu(creeper, player);
             event.setCanceled(true);
             return;
         }
@@ -178,10 +149,14 @@ public final class CreeperInteractionHandler {
                     return;
                 }
 
-                boolean staying = TamedCreeperCommandState.toggleStaying(creeper);
-                player.displayClientMessage(Component.translatable(staying
-                        ? "message.happycreeper.creeper_staying"
-                        : "message.happycreeper.creeper_following").withStyle(ChatFormatting.AQUA), true);
+                if (player.isShiftKeyDown()) {
+                    boolean staying = TamedCreeperCommandState.toggleStaying(creeper);
+                    player.displayClientMessage(Component.translatable(staying
+                            ? "message.happycreeper.creeper_staying"
+                            : "message.happycreeper.creeper_following").withStyle(ChatFormatting.AQUA), true);
+                } else {
+                    openCreeperMenu(creeper, player);
+                }
                 event.setCanceled(true);
             }
             return;
@@ -206,6 +181,13 @@ public final class CreeperInteractionHandler {
                 return;
             }
 
+            if (TamedCreeperAppearance.getVariant(creeper) == TamedCreeperAppearance.RAINBOW_VARIANT) {
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_same_color")
+                        .withStyle(ChatFormatting.YELLOW), true);
+                event.setCanceled(true);
+                return;
+            }
+
             consumeItem(player, stack);
             TamedCreeperAppearance.setVariant(creeper, TamedCreeperAppearance.RAINBOW_VARIANT);
             sendFeedback(player, creeper, "message.happycreeper.creeper_recolored_rainbow");
@@ -225,7 +207,6 @@ public final class CreeperInteractionHandler {
                 return;
             }
 
-            consumeItem(player, stack);
             int variant;
             String messageKey;
             if (isBlueDye) {
@@ -256,7 +237,16 @@ public final class CreeperInteractionHandler {
                 variant = TamedCreeperAppearance.RED_VARIANT;
                 messageKey = "message.happycreeper.creeper_recolored_red";
             }
+
+            if (TamedCreeperAppearance.getVariant(creeper) == variant) {
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_same_color")
+                        .withStyle(ChatFormatting.YELLOW), true);
+                event.setCanceled(true);
+                return;
+            }
+
             TamedCreeperAppearance.setVariant(creeper, variant);
+            consumeItem(player, stack);
             sendFeedback(player, creeper, messageKey);
             event.setCanceled(true);
             return;
@@ -335,47 +325,6 @@ public final class CreeperInteractionHandler {
         return stack.is(Items.POTION);
     }
 
-    private static void equipArmorPiece(Player player, Creeper creeper, ItemStack stack, InteractionHand hand, EquipmentSlot slot) {
-        ItemStack previousArmorPiece = creeper.getItemBySlot(slot).copy();
-        ItemStack equippedArmorPiece = stack.copyWithCount(1);
-
-        creeper.setItemSlot(slot, equippedArmorPiece);
-        creeper.setDropChance(slot, 2.0F);
-        creeper.setPersistenceRequired();
-
-        if (!player.getAbilities().instabuild) {
-            stack.shrink(1);
-        }
-
-        if (!previousArmorPiece.isEmpty()) {
-            returnItemToPlayer(player, hand, previousArmorPiece);
-        }
-    }
-
-    private static EquipmentSlot getRemovableArmorSlot(Creeper creeper) {
-        if (!creeper.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
-            return EquipmentSlot.CHEST;
-        }
-
-        if (!creeper.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
-            return EquipmentSlot.HEAD;
-        }
-
-        return null;
-    }
-
-    private static void returnItemToPlayer(Player player, InteractionHand hand, ItemStack stack) {
-        ItemStack handStack = player.getItemInHand(hand);
-        if (handStack.isEmpty()) {
-            player.setItemInHand(hand, stack);
-            return;
-        }
-
-        if (!player.addItem(stack)) {
-            player.drop(stack, false);
-        }
-    }
-
     private static boolean applyPotionToCreeper(Player player, Creeper creeper, ItemStack stack, PotionContents potionContents) {
         boolean[] applied = {false};
         potionContents.forEachEffect(effect -> {
@@ -432,5 +381,17 @@ public final class CreeperInteractionHandler {
 
     private static boolean isWearingCreeperHead(Player player) {
         return HappyCreeper.isCreeperDisguise(player.getItemBySlot(EquipmentSlot.HEAD));
+    }
+
+    private static void openCreeperMenu(Creeper creeper, Player player) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
+
+        serverPlayer.openMenu(
+                new SimpleMenuProvider(
+                        (containerId, inventory, menuPlayer) -> new com.damian.happycreeper.menu.CreeperMenu(containerId, inventory, creeper),
+                        Component.translatable("screen.happycreeper.creeper.title")),
+                buffer -> buffer.writeInt(creeper.getId()));
     }
 }

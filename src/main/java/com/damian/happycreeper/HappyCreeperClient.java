@@ -4,6 +4,7 @@ import com.damian.happycreeper.client.CreeperChestplateLayer;
 import com.damian.happycreeper.client.CreeperChestplateModel;
 import com.damian.happycreeper.client.CreeperHelmetLayer;
 import com.damian.happycreeper.client.CreeperHelmetModel;
+import com.damian.happycreeper.client.CreeperScreen;
 import com.damian.happycreeper.client.CreeperVariantTextureLayer;
 import com.damian.happycreeper.client.HappyCreeperMaskLayer;
 
@@ -16,6 +17,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 @Mod(value = HappyCreeper.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = HappyCreeper.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
@@ -41,5 +43,10 @@ public class HappyCreeperClient {
                 playerRenderer.addLayer(new HappyCreeperMaskLayer(playerRenderer, event.getEntityModels()));
             }
         }
+    }
+
+    @SubscribeEvent
+    static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
+        event.register(HappyCreeper.CREEPER_MENU.get(), CreeperScreen::new);
     }
 }

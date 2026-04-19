@@ -15,8 +15,9 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 1. Wear a `Creeper Head` or `Happy Creeper Mask` so creepers do not behave normally around you.
 2. Feed a creeper an `Anti-Blast Biscuit` to weaken it.
 3. Feed the weakened creeper a `Sweet Gunpowder Biscuit` to tame it.
-4. Right-click your tamed creeper with an empty main hand to switch between `follow` and `stay`.
-5. Heal it with `Gunpowder` or another `Sweet Gunpowder Biscuit`.
+4. Right-click your tamed creeper with an empty main hand to open its companion UI.
+5. Use `Shift` + right-click with an empty hand to switch between `follow` and `stay`.
+6. Heal it directly with `Gunpowder` or another `Sweet Gunpowder Biscuit`, or let it consume stored fuel when badly hurt.
 
 ## Current Features
 
@@ -39,9 +40,12 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 - Companion behavior:
   - follows the owner
   - can be told to stay in place
+  - supports both in-world `Shift` + right-click follow/stay control and a matching UI button
   - teleports back if left too far behind
   - changes dimension with the owner
   - resyncs to the owner after respawn
+  - no longer blocks sleeping like a nearby hostile mob
+  - supports leads correctly
 - Combat:
   - does not target players by default
   - protects the owner from hostile mobs
@@ -54,14 +58,30 @@ The mod is being developed for actual survival play, so the mechanics are meant 
   - tamed creepers have increased max health
   - owners can heal them with `Gunpowder`
   - owners can heal them more with `Sweet Gunpowder Biscuit`
+  - creepers can store fuel in their UI
+  - stored `Gunpowder` restores `8 HP`
+  - stored `Sweet Gunpowder Biscuit` restores `12 HP`
+  - creepers automatically consume stored fuel to heal themselves when under 50% health
+- Companion UI:
+  - empty-hand right-click opens a dedicated creeper UI
+  - shows a 3D creeper preview
+  - shows current health
+  - shows active potion/status effects
+  - supports helmet and chestplate management
+  - supports a dedicated fuel slot
+  - displays the creeper's custom name if it has one
 - Visual customization:
   - tamed creepers default to the `happy` green texture
   - recolor options currently include `blue`, `cyan`, `gray`, `yellow`, `pink`, `purple`, `red`, `black`
   - `Lime Dye` restores the default happy green texture
   - `Rainbow Biscuit` enables rainbow mode
   - rainbow mode cycles smoothly through the available colored creeper textures
+  - reusing the same dye on the same color no longer wastes the item
 - Loot:
   - `Rainbow Biscuit` can appear in generated structure chests
+- Extra interaction support:
+  - tamed creepers can drink normal potions directly from the owner
+  - direct armor management is now handled through the UI instead of world right-click removal
 
 ## Items
 
@@ -84,10 +104,12 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 Craft `2` biscuits from:
 
 ```text
-Wheat + Sugar + Wheat
+  Wheat
+Wheat Sugar Wheat
+  Wheat
 ```
 
-Place the ingredients horizontally in a crafting grid.
+Place the ingredients in the cross-shaped pattern shown above.
 
 ### Sweet Gunpowder Biscuit
 
@@ -163,9 +185,9 @@ If dependencies get out of sync:
 
 ## Release Status
 
-The current build is suitable for public alpha playtesting.
+The current build is suitable for public beta playtesting.
 
-The main gameplay loop is in place, but balance, visuals, and quality-of-life details are still being tuned.
+The main taming loop, companion UI, armor system, recolor flow, potion support, and fuel-based self-healing are all playable. Balance and polish are still being tuned.
 
 ## License
 
