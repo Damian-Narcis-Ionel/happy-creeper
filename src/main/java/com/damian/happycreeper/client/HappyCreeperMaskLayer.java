@@ -3,21 +3,21 @@ package com.damian.happycreeper.client;
 import com.damian.happycreeper.HappyCreeper;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.SkullBlock;
 
 public final class HappyCreeperMaskLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
-    private static final ResourceLocation MASK_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/happycreeper.png");
+    private static final Identifier MASK_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/happycreeper.png");
     private static final int FULL_COLOR = 0xFFFFFFFF;
     private final SkullModelBase creeperHeadModel;
 

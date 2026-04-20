@@ -4,13 +4,13 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.monster.Creeper;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record CreeperAppearancePayload(int entityId, int variant) implements CustomPacketPayload {
     public static final Type<CreeperAppearancePayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_appearance"));
+            Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_appearance"));
     public static final StreamCodec<RegistryFriendlyByteBuf, CreeperAppearancePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT,
             CreeperAppearancePayload::entityId,

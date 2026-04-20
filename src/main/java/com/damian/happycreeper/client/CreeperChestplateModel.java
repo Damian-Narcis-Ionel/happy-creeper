@@ -12,11 +12,11 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.entity.state.CreeperRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class CreeperChestplateModel extends EntityModel<CreeperRenderState> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_chestplate"),
+            Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_chestplate"),
             "main");
 
     public CreeperChestplateModel(ModelPart root) {

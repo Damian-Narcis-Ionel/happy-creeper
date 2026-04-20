@@ -6,7 +6,7 @@ import com.damian.happycreeper.HappyCreeper;
 import com.damian.happycreeper.TamedCreeperCommandState;
 import com.damian.happycreeper.TamedCreeperOwner;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
@@ -224,9 +224,9 @@ public class CreeperMenu extends AbstractContainerMenu {
 
     private final class CreeperArmorSlot extends Slot {
         private final EquipmentSlot equipmentSlot;
-        private final ResourceLocation emptyIcon;
+        private final Identifier emptyIcon;
 
-        private CreeperArmorSlot(EquipmentSlot equipmentSlot, int index, int x, int y, ResourceLocation emptyIcon) {
+        private CreeperArmorSlot(EquipmentSlot equipmentSlot, int index, int x, int y, Identifier emptyIcon) {
             super(new SimpleContainer(2), index, x, y);
             this.equipmentSlot = equipmentSlot;
             this.emptyIcon = emptyIcon;

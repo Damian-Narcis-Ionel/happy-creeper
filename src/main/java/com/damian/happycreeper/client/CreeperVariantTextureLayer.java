@@ -3,31 +3,32 @@ package com.damian.happycreeper.client;
 import com.damian.happycreeper.TamedCreeperAppearance;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.model.CreeperModel;
+import net.minecraft.client.model.monster.creeper.CreeperModel;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.CreeperRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderState, CreeperModel> {
-    private static final ResourceLocation HAPPY_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/happycreeper.png");
-    private static final ResourceLocation BLUE_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/blue_creeper.png");
-    private static final ResourceLocation CYAN_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/cyan_creeper.png");
-    private static final ResourceLocation GRAY_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/gray_creeper.png");
-    private static final ResourceLocation YELLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/yellow_creeper.png");
-    private static final ResourceLocation PINK_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/pink_creeper.png");
-    private static final ResourceLocation PURPLE_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/purple_creeper.png");
-    private static final ResourceLocation RED_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/red_creeper.png");
-    private static final ResourceLocation BLACK_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/black_creeper.png");
+    private static final Identifier HAPPY_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/happycreeper.png");
+    private static final Identifier BLUE_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/blue_creeper.png");
+    private static final Identifier CYAN_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/cyan_creeper.png");
+    private static final Identifier GRAY_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/gray_creeper.png");
+    private static final Identifier YELLOW_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/yellow_creeper.png");
+    private static final Identifier PINK_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/pink_creeper.png");
+    private static final Identifier PURPLE_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/purple_creeper.png");
+    private static final Identifier RED_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/red_creeper.png");
+    private static final Identifier BLACK_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/black_creeper.png");
     private static final int FULL_COLOR = 0xFFFFFFFF;
     private static final int RAINBOW_CYCLE_TICKS = 8;
-    private static final ResourceLocation[] RAINBOW_TEXTURES = new ResourceLocation[] {
+    private static final Identifier[] RAINBOW_TEXTURES = new Identifier[] {
             RED_TEXTURE,
             YELLOW_TEXTURE,
             HAPPY_TEXTURE,
@@ -50,7 +51,7 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
         int variant = renderState.getRenderDataOrDefault(
                 HappyCreeperRenderStateKeys.CREEPER_VARIANT,
                 TamedCreeperAppearance.NONE_VARIANT);
-        ResourceLocation texture = switch (variant) {
+        Identifier texture = switch (variant) {
             case TamedCreeperAppearance.HAPPY_VARIANT -> HAPPY_TEXTURE;
             case TamedCreeperAppearance.BLUE_VARIANT -> BLUE_TEXTURE;
             case TamedCreeperAppearance.CYAN_VARIANT -> CYAN_TEXTURE;
@@ -92,7 +93,7 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
             SubmitNodeCollector submitNodeCollector,
             int packedLight,
             CreeperRenderState renderState,
-            ResourceLocation texture,
+            Identifier texture,
             int color,
             int order) {
         OrderedSubmitNodeCollector ordered = submitNodeCollector.order(order);
@@ -100,7 +101,7 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
                 getParentModel(),
                 renderState,
                 poseStack,
-                RenderType.entityTranslucent(texture),
+                RenderTypes.entityTranslucent(texture),
                 packedLight,
                 LivingEntityRenderer.getOverlayCoords(renderState, 0.0F),
                 color,
@@ -119,6 +120,6 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
         return new RainbowFrame(RAINBOW_TEXTURES[textureIndex], RAINBOW_TEXTURES[nextTextureIndex], cycleProgress);
     }
 
-    private record RainbowFrame(ResourceLocation currentTexture, ResourceLocation nextTexture, float blend) {
+    private record RainbowFrame(Identifier currentTexture, Identifier nextTexture, float blend) {
     }
 }
