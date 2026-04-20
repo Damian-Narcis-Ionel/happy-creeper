@@ -36,7 +36,7 @@ public final class TamedCreeperOwner {
     }
 
     public static Optional<ServerPlayer> getOwner(Creeper creeper) {
-        MinecraftServer server = creeper.getServer();
+        MinecraftServer server = creeper.level().getServer();
         if (server == null) {
             return Optional.empty();
         }

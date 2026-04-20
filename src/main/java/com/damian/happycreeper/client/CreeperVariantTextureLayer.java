@@ -2,11 +2,11 @@ package com.damian.happycreeper.client;
 
 import com.damian.happycreeper.TamedCreeperAppearance;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.model.CreeperModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -42,12 +42,7 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
     }
 
     @Override
-    public void render(PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int packedLight,
-            CreeperRenderState renderState,
-            float yRot,
-            float xRot) {
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, CreeperRenderState renderState, float yRot, float xRot) {
         if (renderState.isInvisible) {
             return;
         }
@@ -70,7 +65,7 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
         };
 
         if (variant == TamedCreeperAppearance.RAINBOW_VARIANT) {
-            renderRainbow(poseStack, bufferSource, packedLight, renderState);
+            submitRainbow(poseStack, submitNodeCollector, packedLight, renderState);
             return;
         }
 
@@ -78,35 +73,40 @@ public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderS
             return;
         }
 
-        renderColoredCutoutModel(getParentModel(), texture, poseStack, bufferSource, packedLight, renderState, FULL_COLOR);
+        int overlay = LivingEntityRenderer.getOverlayCoords(renderState, 0.0F);
+        renderColoredCutoutModel(getParentModel(), texture, poseStack, submitNodeCollector, packedLight, renderState, FULL_COLOR, overlay);
     }
 
-    private void renderRainbow(PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int packedLight,
-            CreeperRenderState renderState) {
+    private void submitRainbow(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, CreeperRenderState renderState) {
         RainbowFrame frame = getRainbowFrame(renderState);
-        renderTranslucentTexture(poseStack, bufferSource, packedLight, renderState, frame.currentTexture, FULL_COLOR);
+        submitTexture(poseStack, submitNodeCollector, packedLight, renderState, frame.currentTexture(), FULL_COLOR, 0);
 
-        if (frame.blend > 0.0F) {
-            int overlayColor = ARGB.color(Math.round(frame.blend * 255.0F), 255, 255, 255);
-            renderTranslucentTexture(poseStack, bufferSource, packedLight, renderState, frame.nextTexture, overlayColor);
+        if (frame.blend() > 0.0F) {
+            int alpha = Math.round(frame.blend() * 255.0F);
+            int color = ARGB.color(alpha, 255, 255, 255);
+            submitTexture(poseStack, submitNodeCollector, packedLight, renderState, frame.nextTexture(), color, 1);
         }
     }
 
-    private void renderTranslucentTexture(PoseStack poseStack,
-            MultiBufferSource bufferSource,
+    private void submitTexture(PoseStack poseStack,
+            SubmitNodeCollector submitNodeCollector,
             int packedLight,
             CreeperRenderState renderState,
             ResourceLocation texture,
-            int color) {
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityTranslucent(texture));
-        getParentModel().renderToBuffer(
+            int color,
+            int order) {
+        OrderedSubmitNodeCollector ordered = submitNodeCollector.order(order);
+        ordered.submitModel(
+                getParentModel(),
+                renderState,
                 poseStack,
-                vertexConsumer,
+                RenderType.entityTranslucent(texture),
                 packedLight,
                 LivingEntityRenderer.getOverlayCoords(renderState, 0.0F),
-                color);
+                color,
+                null,
+                renderState.outlineColor,
+                null);
     }
 
     private static RainbowFrame getRainbowFrame(CreeperRenderState renderState) {

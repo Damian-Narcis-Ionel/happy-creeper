@@ -1,8 +1,10 @@
 package com.damian.happycreeper;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.portal.TeleportTransition;
@@ -92,7 +94,13 @@ public final class TamedCreeperFollowHandler {
         }
 
         Creeper teleportedCreeper = (Creeper) creeper.teleport(
-                new TeleportTransition(destinationLevel, owner, TeleportTransition.PLACE_PORTAL_TICKET));
+                new TeleportTransition(
+                        destinationLevel,
+                        owner.position(),
+                        Vec3.ZERO,
+                        owner.getYRot(),
+                        owner.getXRot(),
+                        TeleportTransition.PLACE_PORTAL_TICKET));
         if (teleportedCreeper == null) {
             return false;
         }
@@ -106,11 +114,12 @@ public final class TamedCreeperFollowHandler {
             return;
         }
 
-        if (player.getServer() == null) {
+        MinecraftServer server = player.level().getServer();
+        if (server == null) {
             return;
         }
 
-        for (ServerLevel level : player.getServer().getAllLevels()) {
+        for (ServerLevel level : server.getAllLevels()) {
             for (var entity : level.getAllEntities()) {
                 if (!(entity instanceof Creeper creeper)) {
                     continue;

@@ -6,6 +6,9 @@
     "LeashableMixin",
     "MobMixin"
   ],
+  "client": [
+    "AvatarRendererMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

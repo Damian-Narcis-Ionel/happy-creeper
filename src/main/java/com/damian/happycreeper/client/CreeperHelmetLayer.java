@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.model.CreeperModel;
 import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -28,12 +28,7 @@ public final class CreeperHelmetLayer extends RenderLayer<CreeperRenderState, Cr
     }
 
     @Override
-    public void render(PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int packedLight,
-            CreeperRenderState renderState,
-            float yRot,
-            float xRot) {
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, CreeperRenderState renderState, float yRot, float xRot) {
         ItemStack helmet = renderState.getRenderDataOrDefault(HappyCreeperRenderStateKeys.CREEPER_HELMET, ItemStack.EMPTY);
         Equippable equippable = helmet.get(DataComponents.EQUIPPABLE);
         if (equippable == null || equippable.slot() != EquipmentSlot.HEAD || equippable.assetId().isEmpty()) {
@@ -45,9 +40,11 @@ public final class CreeperHelmetLayer extends RenderLayer<CreeperRenderState, Cr
                 EquipmentClientInfo.LayerType.HUMANOID,
                 equippable.assetId().orElseThrow(),
                 this.model,
+                renderState,
                 helmet,
                 poseStack,
-                bufferSource,
-                packedLight);
+                submitNodeCollector,
+                packedLight,
+                renderState.outlineColor);
     }
 }
