@@ -28,6 +28,9 @@ sourceSets.main.resources {
 
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
+    maven {
+        url = "https://maven.parchmentmc.org"
+    }
 }
 
 base {
@@ -41,9 +44,11 @@ neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
+    if (project.findProperty("parchment_enabled") != "false") {
+        parchment {
+            mappingsVersion = project.parchment_mappings_version
+            minecraftVersion = project.parchment_minecraft_version
+        }
     }
 
     // This line is optional. Access Transformers are automatically detected

@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -91,8 +91,8 @@ public final class TamedCreeperFollowHandler {
             return false;
         }
 
-        Creeper teleportedCreeper = (Creeper) creeper.changeDimension(
-                new DimensionTransition(destinationLevel, owner, DimensionTransition.PLACE_PORTAL_TICKET));
+        Creeper teleportedCreeper = (Creeper) creeper.teleport(
+                new TeleportTransition(destinationLevel, owner, TeleportTransition.PLACE_PORTAL_TICKET));
         if (teleportedCreeper == null) {
             return false;
         }

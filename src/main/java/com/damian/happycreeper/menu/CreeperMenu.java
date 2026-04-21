@@ -5,9 +5,8 @@ import com.damian.happycreeper.CreeperState;
 import com.damian.happycreeper.HappyCreeper;
 import com.damian.happycreeper.TamedCreeperCommandState;
 import com.damian.happycreeper.TamedCreeperOwner;
-import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -21,7 +20,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.equipment.Equippable;
 
 public class CreeperMenu extends AbstractContainerMenu {
     private static final int FOLLOW_BUTTON_ID = 0;
@@ -203,7 +202,12 @@ public class CreeperMenu extends AbstractContainerMenu {
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        return stack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == slot;
+        if (!(stack.getItem() instanceof ArmorItem)) {
+            return false;
+        }
+
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        return equippable != null && equippable.slot() == slot;
     }
 
     private static Creeper getCreeper(Inventory playerInventory, int creeperId) {
@@ -222,6 +226,7 @@ public class CreeperMenu extends AbstractContainerMenu {
             super(new SimpleContainer(2), index, x, y);
             this.equipmentSlot = equipmentSlot;
             this.emptyIcon = emptyIcon;
+            this.setBackground(InventoryMenu.BLOCK_ATLAS, emptyIcon);
         }
 
         @Override
@@ -271,11 +276,6 @@ public class CreeperMenu extends AbstractContainerMenu {
         @Override
         public int getMaxStackSize() {
             return 1;
-        }
-
-        @Override
-        public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-            return Pair.of(InventoryMenu.BLOCK_ATLAS, emptyIcon);
         }
 
         @Override

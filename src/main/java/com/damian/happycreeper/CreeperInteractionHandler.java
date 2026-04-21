@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.SimpleMenuProvider;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -317,8 +318,12 @@ public final class CreeperInteractionHandler {
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        return stack.getItem() instanceof ArmorItem armorItem
-                && armorItem.getEquipmentSlot() == slot;
+        if (!(stack.getItem() instanceof ArmorItem)) {
+            return false;
+        }
+
+        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        return equippable != null && equippable.slot() == slot;
     }
 
     private static boolean isPotionItem(ItemStack stack) {
@@ -338,9 +343,7 @@ public final class CreeperInteractionHandler {
             return true;
         }
 
-        ItemStack remainder = stack.getItem().getCraftingRemainingItem() != null
-                ? new ItemStack(stack.getItem().getCraftingRemainingItem())
-                : ItemStack.EMPTY;
+        ItemStack remainder = stack.getItem().getCraftingRemainder();
         if (remainder.isEmpty() && stack.is(Items.POTION)) {
             remainder = new ItemStack(Items.GLASS_BOTTLE);
         }
@@ -353,7 +356,9 @@ public final class CreeperInteractionHandler {
 
     private static void applyPotionEffect(Player player, LivingEntity target, MobEffectInstance effect) {
         if (effect.getEffect().value().isInstantenous()) {
-            effect.getEffect().value().applyInstantenousEffect(player, player, target, effect.getAmplifier(), 1.0D);
+            if (player.level() instanceof ServerLevel serverLevel) {
+                effect.getEffect().value().applyInstantenousEffect(serverLevel, player, player, target, effect.getAmplifier(), 1.0D);
+            }
             return;
         }
 

@@ -6,6 +6,12 @@
     "EntityMixin",
     "MobMixin"
   ],
+  "client": [
+    "CreeperRendererMixin",
+    "CreeperRenderStateMixin",
+    "PlayerRendererMixin",
+    "PlayerRenderStateMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -48,7 +48,7 @@ authors="Asiy"
 description='''
 What if creepers were not angry... just misunderstood?
 
-Happy Creeper is a NeoForge mod for Minecraft 1.21.1 that lets you weaken, tame, heal, recolor, gear up, and fight alongside creepers in survival. Wear a creeper head or Happy Creeper Mask to approach them safely, feed an Anti-Blast Biscuit to weaken them, then use a Sweet Gunpowder Biscuit to make them your friend. Tamed creepers now have a dedicated companion UI with armor slots, fuel storage, active effects, and follow/stay controls.
+Happy Creeper is a NeoForge mod for Minecraft 1.21.4 that lets you weaken, tame, heal, recolor, gear up, and fight alongside creepers in survival. Wear a creeper head or Happy Creeper Mask to approach them safely, feed an Anti-Blast Biscuit to weaken them, then use a Sweet Gunpowder Biscuit to make them your friend. Tamed creepers now have a dedicated companion UI with armor slots, fuel storage, active effects, and follow/stay controls.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
