@@ -1,0 +1,24 @@
+Happy Creeper Public Use License v1.0
+
+Copyright (c) 2026 [Your Name]
+
+Permission is granted to any person to download, install, use, and share unmodified copies of this mod, including in modpacks, launchers, mirrors, and server packs, provided that:
+1. the mod is shared in its original, unmodified form;
+2. proper credit is given to the original author;
+3. where practical, a link to the official project page is included.
+
+You may not, without prior written permission from the copyright holder:
+1. publish, distribute, or share modified versions of this mod;
+2. fork, port, patch, adapt, translate, or create public derivative releases of this mod;
+3. rehost altered files under the same or a different name;
+4. copy substantial portions of the code or assets into another public project.
+
+Private personal modifications for your own use are allowed, but may not be distributed without prior written permission.
+
+Any approved derivative release must:
+1. clearly credit the original author;
+2. link the official project page;
+3. clearly state what was changed.
+
+This license grants no trademark rights.
+This software is provided "as is", without warranty of any kind.
