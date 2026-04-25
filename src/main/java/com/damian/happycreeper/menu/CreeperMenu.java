@@ -1,5 +1,7 @@
 package com.damian.happycreeper.menu;
 
+import com.damian.happycreeper.CreeperAbility;
+import com.damian.happycreeper.CreeperAbilityStorage;
 import com.damian.happycreeper.CreeperFuelStorage;
 import com.damian.happycreeper.CreeperState;
 import com.damian.happycreeper.HappyCreeper;
@@ -44,6 +46,7 @@ public class CreeperMenu extends AbstractContainerMenu {
     private final DataSlot stayingState = DataSlot.standalone();
     private final DataSlot currentHealth = DataSlot.standalone();
     private final DataSlot maxHealth = DataSlot.standalone();
+    private final DataSlot abilitiesBitmask = DataSlot.standalone();
 
     public CreeperMenu(int containerId, Inventory playerInventory, int creeperId) {
         this(containerId, playerInventory, getCreeper(playerInventory, creeperId));
@@ -71,6 +74,7 @@ public class CreeperMenu extends AbstractContainerMenu {
         addDataSlot(stayingState);
         addDataSlot(currentHealth);
         addDataSlot(maxHealth);
+        addDataSlot(abilitiesBitmask);
         broadcastChanges();
     }
 
@@ -90,12 +94,17 @@ public class CreeperMenu extends AbstractContainerMenu {
         return maxHealth.get();
     }
 
+    public boolean hasAbility(CreeperAbility ability) {
+        return (abilitiesBitmask.get() & ability.getMask()) != 0;
+    }
+
     @Override
     public void broadcastChanges() {
         if (creeper != null && !creeper.level().isClientSide()) {
             stayingState.set(TamedCreeperCommandState.isStaying(creeper) ? 1 : 0);
             currentHealth.set(Mth.ceil(creeper.getHealth()));
             maxHealth.set(Mth.ceil(creeper.getMaxHealth()));
+            abilitiesBitmask.set(CreeperAbilityStorage.getBitmask(creeper));
         }
         super.broadcastChanges();
     }
