@@ -59,6 +59,10 @@ public final class CreeperInteractionHandler {
 
         CreeperState currentState = CreeperState.get(creeper);
         boolean isSweetBiscuit = stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT.get());
+        boolean isLavaBiscuit = stack.is(HappyCreeper.LAVA_BISCUIT.get());
+        boolean isFishBiscuit = stack.is(HappyCreeper.FISH_BISCUIT.get());
+        boolean isExtremeBlastBiscuit = stack.is(HappyCreeper.EXTREME_BLAST_BISCUIT.get());
+        boolean isSlimeBiscuit = stack.is(HappyCreeper.SLIME_BISCUIT.get());
         boolean isHealingGunpowder = stack.is(Items.GUNPOWDER);
         boolean isRainbowBiscuit = stack.is(HappyCreeper.RAINBOW_BISCUIT.get());
         boolean isLead = stack.is(Items.LEAD);
@@ -144,7 +148,7 @@ public final class CreeperInteractionHandler {
             return;
         }
 
-        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowBiscuit && !isBlueDye && !isCyanDye && !isGrayDye && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
+        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowBiscuit && !isLavaBiscuit && !isFishBiscuit && !isExtremeBlastBiscuit && !isSlimeBiscuit && !isBlueDye && !isCyanDye && !isGrayDye && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
             if (currentState == CreeperState.TAMED && stack.isEmpty() && TamedCreeperOwner.isOwner(creeper, player)) {
                 if (creeper.isLeashed() && creeper.getLeashHolder() == player) {
                     return;
@@ -192,6 +196,41 @@ public final class CreeperInteractionHandler {
             consumeItem(player, stack);
             TamedCreeperAppearance.setVariant(creeper, TamedCreeperAppearance.RAINBOW_VARIANT);
             sendFeedback(player, creeper, "message.happycreeper.creeper_recolored_rainbow");
+            event.setCanceled(true);
+            return;
+        }
+
+        if (isLavaBiscuit || isFishBiscuit || isExtremeBlastBiscuit || isSlimeBiscuit) {
+            if (currentState != CreeperState.TAMED) {
+                return;
+            }
+
+            if (!TamedCreeperOwner.isOwner(creeper, player)) {
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
+                        .withStyle(ChatFormatting.YELLOW), true);
+                event.setCanceled(true);
+                return;
+            }
+
+            CreeperAbility ability = isLavaBiscuit ? CreeperAbility.FIRE_RESISTANCE
+                    : isFishBiscuit ? CreeperAbility.SWIM_SPEED
+                    : isSlimeBiscuit ? CreeperAbility.SLIME_JUMP
+                    : CreeperAbility.EXTREME_BLAST;
+
+            if (CreeperAbilityStorage.hasAbility(creeper, ability)) {
+                player.displayClientMessage(Component.translatable("message.happycreeper.ability_already_granted")
+                        .withStyle(ChatFormatting.YELLOW), true);
+                event.setCanceled(true);
+                return;
+            }
+
+            consumeItem(player, stack);
+            CreeperAbilityStorage.grantAbility(creeper, ability);
+            String messageKey = isLavaBiscuit ? "message.happycreeper.ability_fire_resistance"
+                    : isFishBiscuit ? "message.happycreeper.ability_swim_speed"
+                    : isSlimeBiscuit ? "message.happycreeper.ability_slime_jump"
+                    : "message.happycreeper.ability_extreme_blast";
+            sendFeedback(player, creeper, messageKey);
             event.setCanceled(true);
             return;
         }
