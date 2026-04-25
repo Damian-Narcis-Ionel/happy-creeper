@@ -31,6 +31,10 @@ public class HappyCreeper {
     public static final DeferredItem<Item> ANTI_BLAST_BISCUIT = ITEMS.registerSimpleItem("anti_blast_biscuit", new Item.Properties());
     public static final DeferredItem<Item> SWEET_GUNPOWDER_BISCUIT = ITEMS.registerSimpleItem("sweet_gunpowder_biscuit", new Item.Properties());
     public static final DeferredItem<Item> RAINBOW_BISCUIT = ITEMS.registerSimpleItem("rainbow_biscuit", new Item.Properties());
+    public static final DeferredItem<Item> LAVA_BISCUIT = ITEMS.registerSimpleItem("lava_biscuit", new Item.Properties());
+    public static final DeferredItem<Item> FISH_BISCUIT = ITEMS.registerSimpleItem("fish_biscuit", new Item.Properties());
+    public static final DeferredItem<Item> EXTREME_BLAST_BISCUIT = ITEMS.registerSimpleItem("extreme_blast_biscuit", new Item.Properties());
+    public static final DeferredItem<Item> SLIME_BISCUIT = ITEMS.registerSimpleItem("slime_biscuit", new Item.Properties());
     public static final DeferredItem<FakeCreeperHeadItem> FAKE_HAPPY_CREEPER_HEAD = ITEMS.registerItem(
             "fake_happy_creeper_head",
             FakeCreeperHeadItem::new,
@@ -55,6 +59,10 @@ public class HappyCreeper {
             event.accept(ANTI_BLAST_BISCUIT);
             event.accept(SWEET_GUNPOWDER_BISCUIT);
             event.accept(RAINBOW_BISCUIT);
+            event.accept(LAVA_BISCUIT);
+            event.accept(FISH_BISCUIT);
+            event.accept(EXTREME_BLAST_BISCUIT);
+            event.accept(SLIME_BISCUIT);
         }
 
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {

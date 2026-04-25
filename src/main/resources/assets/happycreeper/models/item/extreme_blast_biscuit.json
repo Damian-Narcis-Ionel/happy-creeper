@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "happycreeper:item/extreme_blast_biscuit"
+  }
+}
