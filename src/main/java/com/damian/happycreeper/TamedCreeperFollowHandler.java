@@ -64,12 +64,16 @@ public final class TamedCreeperFollowHandler {
             return;
         }
 
+        boolean hasCombatTarget = creeper.getTarget() != null && creeper.getTarget().isAlive();
+
         if (distanceToOwnerSqr >= START_FOLLOWING_DISTANCE_SQR) {
-            creeper.getNavigation().moveTo(owner, FOLLOW_SPEED);
+            if (!hasCombatTarget) {
+                creeper.getNavigation().moveTo(owner, FOLLOW_SPEED);
+            }
             return;
         }
 
-        if (distanceToOwnerSqr <= STOP_FOLLOWING_DISTANCE_SQR) {
+        if (distanceToOwnerSqr <= STOP_FOLLOWING_DISTANCE_SQR && !hasCombatTarget) {
             creeper.getNavigation().stop();
         }
     }
