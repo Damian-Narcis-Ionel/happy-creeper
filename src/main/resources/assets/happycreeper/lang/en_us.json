@@ -35,5 +35,18 @@
   "screen.happycreeper.creeper.fuel": "Fuel",
   "screen.happycreeper.creeper.effect_duration": "Time: %s",
   "screen.happycreeper.creeper.command.staying": "Staying",
-  "screen.happycreeper.creeper.command.following": "Following"
+  "screen.happycreeper.creeper.command.following": "Following",
+  "item.happycreeper.lava_biscuit": "Lava Biscuit",
+  "item.happycreeper.fish_biscuit": "Fish Biscuit",
+  "item.happycreeper.extreme_blast_biscuit": "Extreme Blast Biscuit",
+  "item.happycreeper.slime_biscuit": "Slime Biscuit",
+  "message.happycreeper.ability_already_granted": "Your creeper already has that ability.",
+  "message.happycreeper.ability_fire_resistance": "Your creeper is now fire resistant.",
+  "message.happycreeper.ability_swim_speed": "Your creeper now swims much faster.",
+  "message.happycreeper.ability_extreme_blast": "Your creeper's blasts are now twice as powerful.",
+  "message.happycreeper.ability_slime_jump": "Your creeper learned to leap and stick to enemies.",
+  "ability.happycreeper.fire_resistance": "Fire Resistance",
+  "ability.happycreeper.swim_speed": "Swim Speed",
+  "ability.happycreeper.extreme_blast": "Extreme Blast",
+  "ability.happycreeper.slime_jump": "Slime Jump"
 }
