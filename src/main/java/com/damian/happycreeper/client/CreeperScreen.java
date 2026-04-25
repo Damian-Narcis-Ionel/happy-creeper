@@ -1,5 +1,7 @@
 package com.damian.happycreeper.client;
 
+import com.damian.happycreeper.CreeperAbility;
+import com.damian.happycreeper.HappyCreeper;
 import com.damian.happycreeper.menu.CreeperMenu;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
     private static final int BACKGROUND_WIDTH = 176;
@@ -56,6 +59,9 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
     private static final int EFFECT_X = 177;
     private static final int EFFECT_Y = 18;
     private static final int EFFECT_SPACING = 33;
+    private static final int ABILITY_ICON_START_X = 90;
+    private static final int ABILITY_ICON_Y = 20;
+    private static final int ABILITY_ICON_SPACING = 20;
     private Button commandButton;
 
     public CreeperScreen(CreeperMenu menu, Inventory playerInventory, Component title) {
@@ -81,7 +87,9 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderAbilityIcons(guiGraphics);
         renderEffectTooltips(guiGraphics, mouseX, mouseY);
+        renderAbilityTooltips(guiGraphics, mouseX, mouseY);
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
@@ -202,5 +210,52 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
         List<MobEffectInstance> effects = new ArrayList<>(creeper.getActiveEffects());
         effects.sort(Comparator.comparing(effect -> Component.translatable(effect.getDescriptionId()).getString()));
         return effects;
+    }
+
+    private void renderAbilityIcons(GuiGraphics guiGraphics) {
+        int slot = 0;
+        for (CreeperAbility ability : CreeperAbility.values()) {
+            if (!menu.hasAbility(ability)) {
+                continue;
+            }
+            int x = leftPos + ABILITY_ICON_START_X + slot * ABILITY_ICON_SPACING;
+            int y = topPos + ABILITY_ICON_Y;
+            guiGraphics.renderItem(getAbilityIcon(ability), x, y);
+            slot++;
+        }
+    }
+
+    private void renderAbilityTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        int slot = 0;
+        for (CreeperAbility ability : CreeperAbility.values()) {
+            if (!menu.hasAbility(ability)) {
+                continue;
+            }
+            int x = leftPos + ABILITY_ICON_START_X + slot * ABILITY_ICON_SPACING;
+            int y = topPos + ABILITY_ICON_Y;
+            if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
+                guiGraphics.renderTooltip(font, Component.translatable(getAbilityTooltipKey(ability)), mouseX, mouseY);
+                return;
+            }
+            slot++;
+        }
+    }
+
+    private static ItemStack getAbilityIcon(CreeperAbility ability) {
+        return switch (ability) {
+            case FIRE_RESISTANCE -> new ItemStack(HappyCreeper.LAVA_BISCUIT.get());
+            case SWIM_SPEED -> new ItemStack(HappyCreeper.FISH_BISCUIT.get());
+            case EXTREME_BLAST -> new ItemStack(HappyCreeper.EXTREME_BLAST_BISCUIT.get());
+            case SLIME_JUMP -> new ItemStack(HappyCreeper.SLIME_BISCUIT.get());
+        };
+    }
+
+    private static String getAbilityTooltipKey(CreeperAbility ability) {
+        return switch (ability) {
+            case FIRE_RESISTANCE -> "ability.happycreeper.fire_resistance";
+            case SWIM_SPEED -> "ability.happycreeper.swim_speed";
+            case EXTREME_BLAST -> "ability.happycreeper.extreme_blast";
+            case SLIME_JUMP -> "ability.happycreeper.slime_jump";
+        };
     }
 }
