@@ -79,6 +79,14 @@ The mod is being developed for actual survival play, so the mechanics are meant 
   - reusing the same dye on the same color no longer wastes the item
 - Loot:
   - `Rainbow Biscuit` can appear in generated structure chests
+- Abilities:
+  - tamed creepers can learn permanent abilities by consuming special biscuits
+  - `Lava Biscuit` grants Fire Resistance
+  - `Fish Biscuit` grants Swim Speed
+  - `Extreme Blast Biscuit` grants Extreme Blast (twice as powerful combat blasts)
+  - `Slime Biscuit` grants Slime Jump (leap attacks with sticky landing on enemies)
+  - already-granted abilities cannot be applied twice
+  - active abilities are displayed in the companion UI
 - Extra interaction support:
   - tamed creepers can drink normal potions directly from the owner
   - direct armor management is now handled through the UI instead of world right-click removal
@@ -89,11 +97,15 @@ The mod is being developed for actual survival play, so the mechanics are meant 
 - `Anti-Blast Biscuit`
 - `Sweet Gunpowder Biscuit`
 - `Rainbow Biscuit`
+- `Lava Biscuit`
+- `Fish Biscuit`
+- `Extreme Blast Biscuit`
+- `Slime Biscuit`
 - `Happy Creeper Mask`
 
 `Biscuit` is edible.
 
-`Anti-Blast Biscuit`, `Sweet Gunpowder Biscuit`, and `Rainbow Biscuit` are interaction items and are not edible by players.
+`Anti-Blast Biscuit`, `Sweet Gunpowder Biscuit`, `Rainbow Biscuit`, `Lava Biscuit`, `Fish Biscuit`, `Extreme Blast Biscuit`, and `Slime Biscuit` are interaction items and are not edible by players.
 
 `Happy Creeper Mask` is a wearable disguise item used for the weakening step.
 
@@ -185,9 +197,7 @@ If dependencies get out of sync:
 
 ## Release Status
 
-The current build is suitable for public beta playtesting on Minecraft `1.21.4`.
-
-The main taming loop, companion UI, armor system, recolor flow, potion support, and fuel-based self-healing are all playable. Balance and polish are still being tuned.
+Version `1.2.0` is the first stable release. All core features are complete and stable.
 
 ## License
 
