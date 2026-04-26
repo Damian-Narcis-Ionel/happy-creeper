@@ -1,4 +1,4 @@
-# Happy Creeper 1.2.0
+# Happy Creeper 1.0.0
 
 First stable release for NeoForge on Minecraft 1.21.11.
 
