@@ -2,7 +2,7 @@
 
 Short summary:
 
-Turn creepers into real survival companions by taming them, managing their gear, recoloring them, and bringing them with you into combat and exploration.
+Turn creepers into real survival companions by taming them, managing their gear, recoloring them, unlocking permanent abilities, and bringing them with you into combat and exploration.
 
 ## Overview
 
@@ -32,6 +32,15 @@ Instead of treating every creeper as a threat, you can work through a survival p
 - They work with leads and fit into normal overworld travel better than vanilla creepers
 - They no longer block sleeping like hostile nearby monsters
 
+## Abilities
+
+Tamed creepers can learn permanent abilities by consuming special biscuits. Each ability is stored on the creeper and persists across sessions. Applying the same biscuit twice does nothing.
+
+- `Lava Biscuit` — Fire Resistance
+- `Fish Biscuit` — Swim Speed
+- `Extreme Blast Biscuit` — Extreme Blast (twice as powerful combat blasts)
+- `Slime Biscuit` — Slime Jump (leap attacks with sticky landing on enemies)
+
 ## Customization
 
 - Tamed creepers use a custom happy creeper appearance by default
@@ -57,8 +66,12 @@ Instead of treating every creeper as a threat, you can work through a survival p
 - Anti-Blast Biscuit
 - Sweet Gunpowder Biscuit
 - Rainbow Biscuit
+- Lava Biscuit
+- Fish Biscuit
+- Extreme Blast Biscuit
+- Slime Biscuit
 - Happy Creeper Mask
 
 ## Focus
 
-Happy Creeper is aimed at players who want a more interactive creeper experience without discarding survival balance. The mod focuses on taming progression, practical companion behavior, visual identity, and small quality-of-life details that make the companion feel reliable in regular play.
+Happy Creeper is aimed at players who want a more interactive creeper experience without discarding survival balance. The mod focuses on taming progression, companion abilities, practical companion behavior, visual identity, and small quality-of-life details that make the companion feel reliable in regular play.
