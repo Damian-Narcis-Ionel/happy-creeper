@@ -1,10 +1,10 @@
 # Happy Creeper 1.2.0-beta.1
 
-Public beta build for NeoForge on Minecraft 1.21.4.
+Public beta build for NeoForge on Minecraft 1.21.3.
 
 ## Added
 
-- Minecraft 1.21.4 NeoForge port of the current Happy Creeper beta feature set
+- Minecraft 1.21.3 NeoForge port of the current Happy Creeper beta feature set
 - Dedicated companion UI for tamed creepers
 - 3D creeper preview in the companion UI
 - Helmet and chestplate management directly in the UI
@@ -37,5 +37,5 @@ Public beta build for NeoForge on Minecraft 1.21.4.
 ## Notes
 
 - This is a beta build intended for broader playtesting, not a final release
-- This file targets Minecraft `1.21.4` on NeoForge
+- This file targets Minecraft `1.21.3` on NeoForge
 - The companion UI is now the primary place for armor and fuel management

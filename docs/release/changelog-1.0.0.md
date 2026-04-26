@@ -1,6 +1,6 @@
 # Happy Creeper 1.0.0
 
-First stable release for NeoForge on Minecraft 1.21.2.
+First stable release for NeoForge on Minecraft 1.21.3.
 
 ## Added
 
@@ -22,4 +22,4 @@ First stable release for NeoForge on Minecraft 1.21.2.
 - All features from 1.2.0-beta.1 are included and stable
 - Existing worlds from 1.2.0-beta.1 should continue to work
 - Ability data is stored per-creeper and persists across sessions
-- This file targets Minecraft `1.21.2` on NeoForge
+- This file targets Minecraft `1.21.3` on NeoForge
