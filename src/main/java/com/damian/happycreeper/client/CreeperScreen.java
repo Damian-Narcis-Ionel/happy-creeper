@@ -242,10 +242,10 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
 
     private static ItemStack getAbilityIcon(CreeperAbility ability) {
         return switch (ability) {
-            case FIRE_RESISTANCE -> new ItemStack(HappyCreeper.LAVA_BISCUIT.get());
-            case SWIM_SPEED -> new ItemStack(HappyCreeper.FISH_BISCUIT.get());
-            case EXTREME_BLAST -> new ItemStack(HappyCreeper.EXTREME_BLAST_BISCUIT.get());
-            case SLIME_JUMP -> new ItemStack(HappyCreeper.SLIME_BISCUIT.get());
+            case FIRE_RESISTANCE -> new ItemStack(HappyCreeper.LAVA_BISCUIT);
+            case SWIM_SPEED -> new ItemStack(HappyCreeper.FISH_BISCUIT);
+            case EXTREME_BLAST -> new ItemStack(HappyCreeper.EXTREME_BLAST_BISCUIT);
+            case SLIME_JUMP -> new ItemStack(HappyCreeper.SLIME_BISCUIT);
         };
     }
 

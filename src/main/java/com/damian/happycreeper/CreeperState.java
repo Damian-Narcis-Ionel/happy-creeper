@@ -17,7 +17,7 @@ public enum CreeperState {
     }
 
     public static CreeperState get(Creeper creeper) {
-        CompoundTag data = creeper.getPersistentData();
+        CompoundTag data = IPersistentDataProvider.of(creeper);
         String value = data.getString(STATE_TAG);
 
         for (CreeperState state : values()) {
@@ -30,7 +30,7 @@ public enum CreeperState {
     }
 
     public static void set(Creeper creeper, CreeperState state) {
-        creeper.getPersistentData().putString(STATE_TAG, state.serializedName);
+        IPersistentDataProvider.of(creeper).putString(STATE_TAG, state.serializedName);
     }
 
     public boolean isAtLeastWeakened() {

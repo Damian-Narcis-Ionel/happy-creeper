@@ -53,7 +53,7 @@ public class CreeperMenu extends AbstractContainerMenu {
     }
 
     public CreeperMenu(int containerId, Inventory playerInventory, Creeper creeper) {
-        super(HappyCreeper.CREEPER_MENU.get(), containerId);
+        super(HappyCreeper.CREEPER_MENU, containerId);
         this.creeper = creeper;
 
         addSlot(new CreeperArmorSlot(

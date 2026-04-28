@@ -1,5 +1,7 @@
 package com.damian.happycreeper;
 
+import com.damian.happycreeper.menu.CreeperMenu;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -8,62 +10,51 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.SimpleMenuProvider;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.minecraft.world.phys.EntityHitResult;
 
-@EventBusSubscriber(modid = HappyCreeper.MODID)
 public final class CreeperInteractionHandler {
-    private CreeperInteractionHandler() {
-    }
+    private CreeperInteractionHandler() {}
 
-    @SubscribeEvent
-    public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if (!(event.getTarget() instanceof Creeper creeper)) {
-            return;
-        }
+    static InteractionResult onEntityInteract(Player player, Level level, InteractionHand hand, Entity entity, EntityHitResult hitResult) {
+        if (!(entity instanceof Creeper creeper)) return InteractionResult.PASS;
+        if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
-        Player player = event.getEntity();
-        InteractionHand hand = event.getHand();
-        if (hand != InteractionHand.MAIN_HAND) {
-            return;
-        }
-
-        Level level = event.getLevel();
         ItemStack stack = player.getItemInHand(hand);
         boolean isChestplate = isArmorItemForSlot(stack, EquipmentSlot.CHEST);
         boolean isHelmet = isArmorItemForSlot(stack, EquipmentSlot.HEAD);
         boolean isArmorPiece = isChestplate || isHelmet;
-        boolean isPotion = isPotionItem(stack);
+        boolean isPotion = stack.is(Items.POTION);
         boolean isShiftEmptyHand = player.isShiftKeyDown() && stack.isEmpty();
+
         if (level.isClientSide()) {
             boolean looksTamed = TamedCreeperAppearance.getVariant(creeper) != TamedCreeperAppearance.NONE_VARIANT;
             if (looksTamed && (stack.is(Items.LEAD) || isArmorPiece || isPotion || isShiftEmptyHand)) {
-                event.setCancellationResult(InteractionResult.SUCCESS);
-                event.setCanceled(true);
+                return InteractionResult.SUCCESS;
             }
-            return;
+            return InteractionResult.PASS;
         }
 
         CreeperState currentState = CreeperState.get(creeper);
-        boolean isSweetBiscuit = stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT.get());
-        boolean isLavaBiscuit = stack.is(HappyCreeper.LAVA_BISCUIT.get());
-        boolean isFishBiscuit = stack.is(HappyCreeper.FISH_BISCUIT.get());
-        boolean isExtremeBlastBiscuit = stack.is(HappyCreeper.EXTREME_BLAST_BISCUIT.get());
-        boolean isSlimeBiscuit = stack.is(HappyCreeper.SLIME_BISCUIT.get());
+        boolean isSweetBiscuit = stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT);
+        boolean isLavaBiscuit = stack.is(HappyCreeper.LAVA_BISCUIT);
+        boolean isFishBiscuit = stack.is(HappyCreeper.FISH_BISCUIT);
+        boolean isExtremeBlastBiscuit = stack.is(HappyCreeper.EXTREME_BLAST_BISCUIT);
+        boolean isSlimeBiscuit = stack.is(HappyCreeper.SLIME_BISCUIT);
         boolean isHealingGunpowder = stack.is(Items.GUNPOWDER);
-        boolean isRainbowBiscuit = stack.is(HappyCreeper.RAINBOW_BISCUIT.get());
+        boolean isRainbowBiscuit = stack.is(HappyCreeper.RAINBOW_BISCUIT);
         boolean isLead = stack.is(Items.LEAD);
         boolean isBlueDye = stack.is(Items.BLUE_DYE);
         boolean isCyanDye = stack.is(Items.CYAN_DYE);
@@ -75,84 +66,56 @@ public final class CreeperInteractionHandler {
         boolean isRedDye = stack.is(Items.RED_DYE);
         boolean isBlackDye = stack.is(Items.BLACK_DYE);
 
-        if (stack.is(HappyCreeper.ANTI_BLAST_BISCUIT.get())) {
+        if (stack.is(HappyCreeper.ANTI_BLAST_BISCUIT)) {
             if (!isWearingCreeperHead(player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.need_creeper_head")
-                        .withStyle(ChatFormatting.RED), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.need_creeper_head").withStyle(ChatFormatting.RED), true);
+                return InteractionResult.SUCCESS;
             }
-
             if (currentState.isAtLeastWeakened()) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_weakened")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_weakened").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             consumeItem(player, stack);
             CreeperState.set(creeper, CreeperState.WEAKENED);
             creeper.setPersistenceRequired();
             sendFeedback(player, creeper, "message.happycreeper.creeper_weakened");
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
         if (isLead) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-            return;
+            return InteractionResult.PASS;
         }
 
         if (isPotion) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-            if (applyPotionToCreeper(player, creeper, stack, potionContents)) {
-                event.setCanceled(true);
-            }
-            return;
+            return applyPotionToCreeper(player, creeper, stack, potionContents) ? InteractionResult.SUCCESS : InteractionResult.PASS;
         }
 
         if (isArmorPiece) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             openCreeperMenu(creeper, player);
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
-        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowBiscuit && !isLavaBiscuit && !isFishBiscuit && !isExtremeBlastBiscuit && !isSlimeBiscuit && !isBlueDye && !isCyanDye && !isGrayDye && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
+        if (!isSweetBiscuit && !isHealingGunpowder && !isRainbowBiscuit && !isLavaBiscuit && !isFishBiscuit
+                && !isExtremeBlastBiscuit && !isSlimeBiscuit && !isBlueDye && !isCyanDye && !isGrayDye
+                && !isLimeDye && !isYellowDye && !isPinkDye && !isPurpleDye && !isRedDye && !isBlackDye) {
             if (currentState == CreeperState.TAMED && stack.isEmpty() && TamedCreeperOwner.isOwner(creeper, player)) {
-                if (creeper.isLeashed() && creeper.getLeashHolder() == player) {
-                    return;
-                }
-
+                if (creeper.isLeashed() && creeper.getLeashHolder() == player) return InteractionResult.PASS;
                 if (player.isShiftKeyDown()) {
                     boolean staying = TamedCreeperCommandState.toggleStaying(creeper);
                     player.displayClientMessage(Component.translatable(staying
@@ -161,68 +124,46 @@ public final class CreeperInteractionHandler {
                 } else {
                     openCreeperMenu(creeper, player);
                 }
-                event.setCanceled(true);
+                return InteractionResult.SUCCESS;
             }
-            return;
+            return InteractionResult.PASS;
         }
 
         if (currentState == CreeperState.NORMAL) {
-            player.displayClientMessage(Component.translatable("message.happycreeper.need_to_weaken_first")
-                    .withStyle(ChatFormatting.RED), true);
-            event.setCanceled(true);
-            return;
+            player.displayClientMessage(Component.translatable("message.happycreeper.need_to_weaken_first").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.SUCCESS;
         }
 
         if (isRainbowBiscuit) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             if (TamedCreeperAppearance.getVariant(creeper) == TamedCreeperAppearance.RAINBOW_VARIANT) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_same_color")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_same_color").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             consumeItem(player, stack);
             TamedCreeperAppearance.setVariant(creeper, TamedCreeperAppearance.RAINBOW_VARIANT);
             sendFeedback(player, creeper, "message.happycreeper.creeper_recolored_rainbow");
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
         if (isLavaBiscuit || isFishBiscuit || isExtremeBlastBiscuit || isSlimeBiscuit) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             CreeperAbility ability = isLavaBiscuit ? CreeperAbility.FIRE_RESISTANCE
                     : isFishBiscuit ? CreeperAbility.SWIM_SPEED
                     : isSlimeBiscuit ? CreeperAbility.SLIME_JUMP
                     : CreeperAbility.EXTREME_BLAST;
-
             if (CreeperAbilityStorage.hasAbility(creeper, ability)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.ability_already_granted")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.ability_already_granted").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             consumeItem(player, stack);
             CreeperAbilityStorage.grantAbility(creeper, ability);
             String messageKey = isLavaBiscuit ? "message.happycreeper.ability_fire_resistance"
@@ -230,115 +171,68 @@ public final class CreeperInteractionHandler {
                     : isSlimeBiscuit ? "message.happycreeper.ability_slime_jump"
                     : "message.happycreeper.ability_extreme_blast";
             sendFeedback(player, creeper, messageKey);
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
         if (isBlueDye || isCyanDye || isGrayDye || isLimeDye || isYellowDye || isPinkDye || isPurpleDye || isRedDye || isBlackDye) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             int variant;
             String messageKey;
-            if (isBlueDye) {
-                variant = TamedCreeperAppearance.BLUE_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_blue";
-            } else if (isCyanDye) {
-                variant = TamedCreeperAppearance.CYAN_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_cyan";
-            } else if (isGrayDye) {
-                variant = TamedCreeperAppearance.GRAY_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_gray";
-            } else if (isLimeDye) {
-                variant = TamedCreeperAppearance.HAPPY_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_happy";
-            } else if (isYellowDye) {
-                variant = TamedCreeperAppearance.YELLOW_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_yellow";
-            } else if (isPinkDye) {
-                variant = TamedCreeperAppearance.PINK_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_pink";
-            } else if (isPurpleDye) {
-                variant = TamedCreeperAppearance.PURPLE_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_purple";
-            } else if (isBlackDye) {
-                variant = TamedCreeperAppearance.BLACK_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_black";
-            } else {
-                variant = TamedCreeperAppearance.RED_VARIANT;
-                messageKey = "message.happycreeper.creeper_recolored_red";
-            }
-
+            if (isBlueDye)        { variant = TamedCreeperAppearance.BLUE_VARIANT;   messageKey = "message.happycreeper.creeper_recolored_blue"; }
+            else if (isCyanDye)   { variant = TamedCreeperAppearance.CYAN_VARIANT;   messageKey = "message.happycreeper.creeper_recolored_cyan"; }
+            else if (isGrayDye)   { variant = TamedCreeperAppearance.GRAY_VARIANT;   messageKey = "message.happycreeper.creeper_recolored_gray"; }
+            else if (isLimeDye)   { variant = TamedCreeperAppearance.HAPPY_VARIANT;  messageKey = "message.happycreeper.creeper_recolored_happy"; }
+            else if (isYellowDye) { variant = TamedCreeperAppearance.YELLOW_VARIANT; messageKey = "message.happycreeper.creeper_recolored_yellow"; }
+            else if (isPinkDye)   { variant = TamedCreeperAppearance.PINK_VARIANT;   messageKey = "message.happycreeper.creeper_recolored_pink"; }
+            else if (isPurpleDye) { variant = TamedCreeperAppearance.PURPLE_VARIANT; messageKey = "message.happycreeper.creeper_recolored_purple"; }
+            else if (isBlackDye)  { variant = TamedCreeperAppearance.BLACK_VARIANT;  messageKey = "message.happycreeper.creeper_recolored_black"; }
+            else                  { variant = TamedCreeperAppearance.RED_VARIANT;    messageKey = "message.happycreeper.creeper_recolored_red"; }
             if (TamedCreeperAppearance.getVariant(creeper) == variant) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_same_color")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_same_color").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             TamedCreeperAppearance.setVariant(creeper, variant);
             consumeItem(player, stack);
             sendFeedback(player, creeper, messageKey);
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
         if (isHealingGunpowder) {
-            if (currentState != CreeperState.TAMED) {
-                return;
-            }
-
+            if (currentState != CreeperState.TAMED) return InteractionResult.PASS;
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             if (creeper.getHealth() >= creeper.getMaxHealth()) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_full_health")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_full_health").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             consumeItem(player, stack);
             creeper.heal(2.0F);
             sendFeedback(player, creeper, "message.happycreeper.creeper_healed");
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
         if (currentState == CreeperState.TAMED) {
             if (!TamedCreeperOwner.isOwner(creeper, player)) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_tamed").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             if (creeper.getHealth() >= creeper.getMaxHealth()) {
-                player.displayClientMessage(Component.translatable("message.happycreeper.already_full_health")
-                        .withStyle(ChatFormatting.YELLOW), true);
-                event.setCanceled(true);
-                return;
+                player.displayClientMessage(Component.translatable("message.happycreeper.already_full_health").withStyle(ChatFormatting.YELLOW), true);
+                return InteractionResult.SUCCESS;
             }
-
             consumeItem(player, stack);
             creeper.heal(4.0F);
             sendFeedback(player, creeper, "message.happycreeper.creeper_healed");
-            event.setCanceled(true);
-            return;
+            return InteractionResult.SUCCESS;
         }
 
+        // WEAKENED state with a sweet biscuit → tame
         consumeItem(player, stack);
         CreeperState.set(creeper, CreeperState.TAMED);
         creeper.setPersistenceRequired();
@@ -346,22 +240,15 @@ public final class CreeperInteractionHandler {
         TamedCreeperCommandState.setStaying(creeper, false);
         TamedCreeperAppearance.setVariant(creeper, TamedCreeperAppearance.HAPPY_VARIANT);
         sendFeedback(player, creeper, "message.happycreeper.creeper_tamed");
-        event.setCanceled(true);
+        return InteractionResult.SUCCESS;
     }
 
     private static void consumeItem(Player player, ItemStack stack) {
-        if (!player.getAbilities().instabuild) {
-            stack.shrink(1);
-        }
+        if (!player.getAbilities().instabuild) stack.shrink(1);
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        return stack.getItem() instanceof ArmorItem armorItem
-                && armorItem.getEquipmentSlot() == slot;
-    }
-
-    private static boolean isPotionItem(ItemStack stack) {
-        return stack.is(Items.POTION);
+        return stack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == slot;
     }
 
     private static boolean applyPotionToCreeper(Player player, Creeper creeper, ItemStack stack, PotionContents potionContents) {
@@ -370,22 +257,15 @@ public final class CreeperInteractionHandler {
             applyPotionEffect(player, creeper, effect);
             applied[0] = true;
         });
-
         if (!applied[0]) {
-            player.displayClientMessage(Component.translatable("message.happycreeper.potion_no_effect")
-                    .withStyle(ChatFormatting.YELLOW), true);
+            player.displayClientMessage(Component.translatable("message.happycreeper.potion_no_effect").withStyle(ChatFormatting.YELLOW), true);
             return true;
         }
-
         ItemStack remainder = stack.getItem().getCraftingRemainingItem() != null
-                ? new ItemStack(stack.getItem().getCraftingRemainingItem())
-                : ItemStack.EMPTY;
-        if (remainder.isEmpty() && stack.is(Items.POTION)) {
-            remainder = new ItemStack(Items.GLASS_BOTTLE);
-        }
-
-        ItemStack resultStack = remainder.isEmpty() ? ItemStack.EMPTY : remainder.copy();
-        player.setItemInHand(InteractionHand.MAIN_HAND, ItemUtils.createFilledResult(stack, player, resultStack));
+                ? new ItemStack(stack.getItem().getCraftingRemainingItem()) : ItemStack.EMPTY;
+        if (remainder.isEmpty() && stack.is(Items.POTION)) remainder = new ItemStack(Items.GLASS_BOTTLE);
+        player.setItemInHand(InteractionHand.MAIN_HAND,
+                ItemUtils.createFilledResult(stack, player, remainder.isEmpty() ? ItemStack.EMPTY : remainder.copy()));
         sendFeedback(player, creeper, "message.happycreeper.creeper_drank_potion");
         return true;
     }
@@ -395,26 +275,17 @@ public final class CreeperInteractionHandler {
             effect.getEffect().value().applyInstantenousEffect(player, player, target, effect.getAmplifier(), 1.0D);
             return;
         }
-
         target.addEffect(new MobEffectInstance(effect));
     }
 
     private static void sendFeedback(Player player, Creeper creeper, String messageKey) {
         player.displayClientMessage(Component.translatable(messageKey).withStyle(ChatFormatting.GREEN), true);
-
         if (player.level() instanceof ServerLevel serverLevel) {
             var particleType = "message.happycreeper.creeper_tamed".equals(messageKey)
                     ? net.minecraft.core.particles.ParticleTypes.HEART
                     : net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER;
-            serverLevel.sendParticles(particleType,
-                    creeper.getX(),
-                    creeper.getY() + 1.0D,
-                    creeper.getZ(),
-                    10,
-                    0.3D,
-                    0.4D,
-                    0.3D,
-                    0.01D);
+            serverLevel.sendParticles(particleType, creeper.getX(), creeper.getY() + 1.0D, creeper.getZ(),
+                    10, 0.3D, 0.4D, 0.3D, 0.01D);
         }
     }
 
@@ -423,14 +294,20 @@ public final class CreeperInteractionHandler {
     }
 
     private static void openCreeperMenu(Creeper creeper, Player player) {
-        if (!(player instanceof ServerPlayer serverPlayer)) {
-            return;
-        }
-
-        serverPlayer.openMenu(
-                new SimpleMenuProvider(
-                        (containerId, inventory, menuPlayer) -> new com.damian.happycreeper.menu.CreeperMenu(containerId, inventory, creeper),
-                        Component.translatable("screen.happycreeper.creeper.title")),
-                buffer -> buffer.writeInt(creeper.getId()));
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        serverPlayer.openMenu(new ExtendedScreenHandlerFactory<Integer>() {
+            @Override
+            public Integer getScreenOpeningData(ServerPlayer p) {
+                return creeper.getId();
+            }
+            @Override
+            public Component getDisplayName() {
+                return Component.translatable("screen.happycreeper.creeper.title");
+            }
+            @Override
+            public AbstractContainerMenu createMenu(int syncId, Inventory inventory, Player p) {
+                return new CreeperMenu(syncId, inventory, creeper);
+            }
+        });
     }
 }

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "happycreeper",
+  "version": "${version}",
+  "name": "Happy Creeper",
+  "description": "What if creepers were not angry... just misunderstood? Weaken, tame, heal, recolor, gear up, and fight alongside creepers.",
+  "authors": ["Asiy"],
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.damian.happycreeper.HappyCreeper"],
+    "client": ["com.damian.happycreeper.HappyCreeperClient"]
+  },
+  "mixins": ["happycreeper.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

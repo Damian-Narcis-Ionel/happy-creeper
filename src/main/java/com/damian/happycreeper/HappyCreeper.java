@@ -1,72 +1,87 @@
 package com.damian.happycreeper;
 
 import com.damian.happycreeper.menu.CreeperMenu;
-
+import com.damian.happycreeper.network.SyncColorVariantPacket;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.MenuType;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-@Mod(HappyCreeper.MODID)
-public class HappyCreeper {
+public class HappyCreeper implements ModInitializer {
     public static final String MODID = "happycreeper";
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
-    public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(net.minecraft.core.registries.BuiltInRegistries.MENU, MODID);
-    public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MODID);
 
-    public static final DeferredItem<Item> BISCUIT = ITEMS.registerSimpleItem("biscuit",
-            new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.3f).build()));
-    public static final DeferredItem<Item> ANTI_BLAST_BISCUIT = ITEMS.registerSimpleItem("anti_blast_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> SWEET_GUNPOWDER_BISCUIT = ITEMS.registerSimpleItem("sweet_gunpowder_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> RAINBOW_BISCUIT = ITEMS.registerSimpleItem("rainbow_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> LAVA_BISCUIT = ITEMS.registerSimpleItem("lava_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> FISH_BISCUIT = ITEMS.registerSimpleItem("fish_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> EXTREME_BLAST_BISCUIT = ITEMS.registerSimpleItem("extreme_blast_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> SLIME_BISCUIT = ITEMS.registerSimpleItem("slime_biscuit", new Item.Properties());
-    public static final DeferredItem<Item> FAKE_HAPPY_CREEPER_HEAD = ITEMS.register("fake_happy_creeper_head",
-            () -> new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
-    public static final DeferredHolder<MenuType<?>, MenuType<CreeperMenu>> CREEPER_MENU = MENUS.register(
-            "creeper_menu",
-            () -> IMenuTypeExtension.create((windowId, inventory, extraData) -> new CreeperMenu(windowId, inventory, extraData.readInt())));
+    public static final Item BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "biscuit"),
+            new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.3f).build())));
+    public static final Item ANTI_BLAST_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "anti_blast_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item SWEET_GUNPOWDER_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "sweet_gunpowder_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item RAINBOW_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "rainbow_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item LAVA_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "lava_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item FISH_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "fish_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item EXTREME_BLAST_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "extreme_blast_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item SLIME_BISCUIT = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "slime_biscuit"),
+            new Item(new Item.Properties()));
+    public static final Item FAKE_HAPPY_CREEPER_HEAD = Registry.register(
+            BuiltInRegistries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(MODID, "fake_happy_creeper_head"),
+            new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
 
-    public HappyCreeper(IEventBus modEventBus) {
-        TamedCreeperAppearance.init();
+    public static final MenuType<CreeperMenu> CREEPER_MENU = Registry.register(
+            BuiltInRegistries.MENU,
+            ResourceLocation.fromNamespaceAndPath(MODID, "creeper_menu"),
+            new ExtendedScreenHandlerType<>((syncId, inventory, entityId) -> new CreeperMenu(syncId, inventory, entityId), ByteBufCodecs.VAR_INT));
 
-        ITEMS.register(modEventBus);
-        MENUS.register(modEventBus);
-        ATTACHMENTS.register(modEventBus);
-        modEventBus.addListener(this::addCreative);
-    }
+    @Override
+    public void onInitialize() {
+        PayloadTypeRegistry.playS2C().register(SyncColorVariantPacket.TYPE, SyncColorVariantPacket.CODEC);
+        EventRegistrar.register();
+        LootInjector.register();
 
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
-            event.accept(BISCUIT);
-            event.accept(ANTI_BLAST_BISCUIT);
-            event.accept(SWEET_GUNPOWDER_BISCUIT);
-            event.accept(RAINBOW_BISCUIT);
-            event.accept(LAVA_BISCUIT);
-            event.accept(FISH_BISCUIT);
-            event.accept(EXTREME_BLAST_BISCUIT);
-            event.accept(SLIME_BISCUIT);
-        }
-
-        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            event.accept(FAKE_HAPPY_CREEPER_HEAD);
-        }
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS).register(entries -> {
+            entries.accept(BISCUIT);
+            entries.accept(ANTI_BLAST_BISCUIT);
+            entries.accept(SWEET_GUNPOWDER_BISCUIT);
+            entries.accept(RAINBOW_BISCUIT);
+            entries.accept(LAVA_BISCUIT);
+            entries.accept(FISH_BISCUIT);
+            entries.accept(EXTREME_BLAST_BISCUIT);
+            entries.accept(SLIME_BISCUIT);
+        });
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).register(entries -> entries.accept(FAKE_HAPPY_CREEPER_HEAD));
     }
 
     public static boolean isCreeperDisguise(ItemStack stack) {
-        return stack.is(Items.CREEPER_HEAD) || stack.is(FAKE_HAPPY_CREEPER_HEAD.get());
+        return stack.is(Items.CREEPER_HEAD) || stack.is(FAKE_HAPPY_CREEPER_HEAD);
     }
 }

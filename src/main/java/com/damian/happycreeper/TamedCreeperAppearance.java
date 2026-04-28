@@ -1,16 +1,10 @@
 package com.damian.happycreeper;
 
-import com.mojang.serialization.Codec;
-
-import net.minecraft.network.codec.ByteBufCodecs;
+import com.damian.happycreeper.network.SyncColorVariantPacket;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.world.entity.monster.Creeper;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
-@EventBusSubscriber(modid = HappyCreeper.MODID)
 public final class TamedCreeperAppearance {
     public static final int NONE_VARIANT = 0;
     public static final int HAPPY_VARIANT = 1;
@@ -24,39 +18,25 @@ public final class TamedCreeperAppearance {
     public static final int BLACK_VARIANT = 9;
     public static final int RAINBOW_VARIANT = 10;
 
-    private TamedCreeperAppearance() {
-    }
+    public static final String COLOR_VARIANT_TAG = "HappyCreeperColorVariant";
 
-    public static void init() {
-        // Forces class loading during mod initialization so the attachment registers in time.
-    }
-
-    public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> COLOR_VARIANT = HappyCreeper.ATTACHMENTS.register(
-            "color_variant",
-            () -> AttachmentType.builder(() -> NONE_VARIANT)
-                    .serialize(Codec.INT)
-                    .sync(ByteBufCodecs.VAR_INT)
-                    .build());
+    private TamedCreeperAppearance() {}
 
     public static int getVariant(Creeper creeper) {
-        return creeper.getData(COLOR_VARIANT.get());
+        return IPersistentDataProvider.of(creeper).getInt(COLOR_VARIANT_TAG);
     }
 
     public static void setVariant(Creeper creeper, int variant) {
-        creeper.setData(COLOR_VARIANT.get(), variant);
-        creeper.syncData(COLOR_VARIANT.get());
+        IPersistentDataProvider.of(creeper).putInt(COLOR_VARIANT_TAG, variant);
+        if (!creeper.level().isClientSide()) {
+            SyncColorVariantPacket packet = new SyncColorVariantPacket(creeper.getId(), variant);
+            PlayerLookup.tracking(creeper).forEach(player -> ServerPlayNetworking.send(player, packet));
+        }
     }
 
     public static void ensureTamedAppearance(Creeper creeper) {
         if (CreeperState.get(creeper) == CreeperState.TAMED && getVariant(creeper) == NONE_VARIANT) {
             setVariant(creeper, HAPPY_VARIANT);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityTick(EntityTickEvent.Pre event) {
-        if (event.getEntity() instanceof Creeper creeper && !creeper.level().isClientSide()) {
-            ensureTamedAppearance(creeper);
         }
     }
 }

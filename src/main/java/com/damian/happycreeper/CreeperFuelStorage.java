@@ -15,7 +15,7 @@ public final class CreeperFuelStorage {
     }
 
     public static ItemStack getFuelStack(Creeper creeper) {
-        CompoundTag data = creeper.getPersistentData();
+        CompoundTag data = IPersistentDataProvider.of(creeper);
         if (!data.contains(FUEL_STACK_TAG, Tag.TAG_COMPOUND)) {
             return ItemStack.EMPTY;
         }
@@ -24,7 +24,7 @@ public final class CreeperFuelStorage {
     }
 
     public static void setFuelStack(Creeper creeper, ItemStack stack) {
-        CompoundTag data = creeper.getPersistentData();
+        CompoundTag data = IPersistentDataProvider.of(creeper);
         if (stack.isEmpty()) {
             data.remove(FUEL_STACK_TAG);
             return;
@@ -37,7 +37,7 @@ public final class CreeperFuelStorage {
     }
 
     public static boolean isFuelItem(ItemStack stack) {
-        return stack.is(Items.GUNPOWDER) || stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT.get());
+        return stack.is(Items.GUNPOWDER) || stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT);
     }
 
     public static float consumeFuelAndGetHealAmount(Creeper creeper) {
@@ -53,7 +53,7 @@ public final class CreeperFuelStorage {
     }
 
     private static float getHealAmount(ItemStack stack) {
-        if (stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT.get())) {
+        if (stack.is(HappyCreeper.SWEET_GUNPOWDER_BISCUIT)) {
             return SWEET_BISCUIT_HEAL_AMOUNT;
         }
 

@@ -17,11 +17,11 @@ public final class TamedCreeperOwner {
     }
 
     public static void setOwner(Creeper creeper, UUID ownerUuid) {
-        creeper.getPersistentData().putUUID(OWNER_UUID_TAG, ownerUuid);
+        IPersistentDataProvider.of(creeper).putUUID(OWNER_UUID_TAG, ownerUuid);
     }
 
     public static Optional<UUID> getOwnerUuid(Creeper creeper) {
-        CompoundTag data = creeper.getPersistentData();
+        CompoundTag data = IPersistentDataProvider.of(creeper);
         if (!data.hasUUID(OWNER_UUID_TAG)) {
             return Optional.empty();
         }

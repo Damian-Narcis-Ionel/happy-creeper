@@ -10,11 +10,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
-@EventBusSubscriber(modid = HappyCreeper.MODID)
 public final class TamedCreeperAttributeHandler {
     private static final ResourceLocation TAMED_HEALTH_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_health_bonus");
     private static final ResourceLocation TAMED_ARMOR_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_armor_bonus");
@@ -25,31 +21,20 @@ public final class TamedCreeperAttributeHandler {
     private static final ResourceLocation LEGACY_KNOCKBACK_NORMALIZATION_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_knockback_normalization");
     private static final AttributeModifier TAMED_HEALTH_BONUS = new AttributeModifier(TAMED_HEALTH_BONUS_ID, 20.0D, Operation.ADD_VALUE);
 
-    private TamedCreeperAttributeHandler() {
-    }
+    private TamedCreeperAttributeHandler() {}
 
-    @SubscribeEvent
-    public static void onEntityTick(EntityTickEvent.Pre event) {
-        if (!(event.getEntity() instanceof Creeper creeper)) {
-            return;
-        }
-
+    public static void tick(Creeper creeper) {
         AttributeInstance maxHealth = creeper.getAttribute(Attributes.MAX_HEALTH);
-        if (maxHealth == null) {
-            return;
-        }
-
+        if (maxHealth == null) return;
         AttributeInstance armor = creeper.getAttribute(Attributes.ARMOR);
         AttributeInstance armorToughness = creeper.getAttribute(Attributes.ARMOR_TOUGHNESS);
         AttributeInstance knockbackResistance = creeper.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
         clearLegacyArmorNormalization(creeper);
-
         if (CreeperState.get(creeper) == CreeperState.TAMED) {
             applyTamedHealthBonus(creeper, maxHealth);
             applyArmorPieceBonuses(creeper, armor, armorToughness, knockbackResistance);
             return;
         }
-
         removeBonusModifier(armor, TAMED_ARMOR_BONUS_ID);
         removeBonusModifier(armorToughness, TAMED_TOUGHNESS_BONUS_ID);
         removeBonusModifier(knockbackResistance, TAMED_KNOCKBACK_BONUS_ID);
@@ -59,12 +44,9 @@ public final class TamedCreeperAttributeHandler {
     }
 
     private static void applyTamedHealthBonus(Creeper creeper, AttributeInstance maxHealth) {
-        if (maxHealth.hasModifier(TAMED_HEALTH_BONUS_ID)) {
-            return;
-        }
-
+        if (maxHealth.hasModifier(TAMED_HEALTH_BONUS_ID)) return;
         maxHealth.addOrReplacePermanentModifier(TAMED_HEALTH_BONUS);
-        creeper.setHealth(Math.min(creeper.getHealth() + (float) TAMED_HEALTH_BONUS.amount(), creeper.getMaxHealth()));
+        creeper.setHealth(Math.min(creeper.getHealth() + (float)TAMED_HEALTH_BONUS.amount(), creeper.getMaxHealth()));
     }
 
     private static void clearLegacyArmorNormalization(Creeper creeper) {
@@ -73,14 +55,10 @@ public final class TamedCreeperAttributeHandler {
         removeLegacyModifier(creeper.getAttribute(Attributes.KNOCKBACK_RESISTANCE), LEGACY_KNOCKBACK_NORMALIZATION_ID);
     }
 
-    private static void applyArmorPieceBonuses(Creeper creeper,
-            AttributeInstance armor,
-            AttributeInstance armorToughness,
-            AttributeInstance knockbackResistance) {
+    private static void applyArmorPieceBonuses(Creeper creeper, AttributeInstance armor, AttributeInstance armorToughness, AttributeInstance knockbackResistance) {
         double armorBonus = getEquippedAttributeValue(creeper, Attributes.ARMOR);
         double toughnessBonus = getEquippedAttributeValue(creeper, Attributes.ARMOR_TOUGHNESS);
         double knockbackBonus = getEquippedAttributeValue(creeper, Attributes.KNOCKBACK_RESISTANCE);
-
         applyOrRemoveBonusModifier(armor, TAMED_ARMOR_BONUS_ID, armorBonus);
         applyOrRemoveBonusModifier(armorToughness, TAMED_TOUGHNESS_BONUS_ID, toughnessBonus);
         applyOrRemoveBonusModifier(knockbackResistance, TAMED_KNOCKBACK_BONUS_ID, knockbackBonus);
@@ -92,10 +70,7 @@ public final class TamedCreeperAttributeHandler {
     }
 
     private static double getSlotAttributeValue(ItemStack stack, EquipmentSlot slot, Holder<Attribute> attribute) {
-        if (stack.isEmpty()) {
-            return 0.0D;
-        }
-
+        if (stack.isEmpty()) return 0.0D;
         final double[] total = {0.0D};
         stack.forEachModifier(slot, (holder, modifier) -> {
             if (holder.equals(attribute) && modifier.operation() == Operation.ADD_VALUE) {
@@ -106,27 +81,19 @@ public final class TamedCreeperAttributeHandler {
     }
 
     private static void applyOrRemoveBonusModifier(AttributeInstance attribute, ResourceLocation modifierId, double amount) {
-        if (attribute == null) {
-            return;
-        }
-
+        if (attribute == null) return;
         if (Math.abs(amount) < 1.0E-6D) {
             attribute.removeModifier(modifierId);
             return;
         }
-
         attribute.addOrReplacePermanentModifier(new AttributeModifier(modifierId, amount, Operation.ADD_VALUE));
     }
 
     private static void removeLegacyModifier(AttributeInstance attribute, ResourceLocation modifierId) {
-        if (attribute != null) {
-            attribute.removeModifier(modifierId);
-        }
+        if (attribute != null) attribute.removeModifier(modifierId);
     }
 
     private static void removeBonusModifier(AttributeInstance attribute, ResourceLocation modifierId) {
-        if (attribute != null) {
-            attribute.removeModifier(modifierId);
-        }
+        if (attribute != null) attribute.removeModifier(modifierId);
     }
 }

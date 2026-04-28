@@ -2,9 +2,12 @@
   "required": true,
   "package": "com.damian.happycreeper.mixin",
   "compatibilityLevel": "JAVA_21",
+  "refmap": "happycreeper.refmap.json",
   "mixins": [
+    "CreeperMixin",
     "EntityMixin",
-    "MobMixin"
+    "MobMixin",
+    "MonsterMixin"
   ],
   "injectors": {
     "defaultRequire": 1

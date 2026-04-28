@@ -39,7 +39,7 @@ public final class HappyCreeperMaskLayer extends RenderLayer<AbstractClientPlaye
             float ageInTicks,
             float netHeadYaw,
             float headPitch) {
-        if (player.isInvisible() || !player.getItemBySlot(EquipmentSlot.HEAD).is(HappyCreeper.FAKE_HAPPY_CREEPER_HEAD.get()) || this.creeperHeadModel == null) {
+        if (player.isInvisible() || !player.getItemBySlot(EquipmentSlot.HEAD).is(HappyCreeper.FAKE_HAPPY_CREEPER_HEAD) || this.creeperHeadModel == null) {
             return;
         }
 

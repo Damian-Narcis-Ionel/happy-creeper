@@ -7,46 +7,50 @@ import com.damian.happycreeper.client.CreeperHelmetModel;
 import com.damian.happycreeper.client.CreeperScreen;
 import com.damian.happycreeper.client.CreeperVariantTextureLayer;
 import com.damian.happycreeper.client.HappyCreeperMaskLayer;
-
-import net.minecraft.client.renderer.entity.CreeperRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.resources.PlayerSkin;
+import com.damian.happycreeper.network.SyncColorVariantPacket;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.model.CreeperModel;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.EntityType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.minecraft.world.entity.monster.Creeper;
 
-@Mod(value = HappyCreeper.MODID, dist = Dist.CLIENT)
-@EventBusSubscriber(modid = HappyCreeper.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
-public class HappyCreeperClient {
-    @SubscribeEvent
-    static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(CreeperChestplateModel.LAYER_LOCATION, CreeperChestplateModel::createBodyLayer);
-        event.registerLayerDefinition(CreeperHelmetModel.LAYER_LOCATION, CreeperHelmetModel::createBodyLayer);
-    }
+public class HappyCreeperClient implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        ClientPlayNetworking.registerGlobalReceiver(SyncColorVariantPacket.TYPE, (payload, context) ->
+                context.client().execute(() -> {
+                    if (context.client().level != null
+                            && context.client().level.getEntity(payload.entityId()) instanceof Creeper creeper) {
+                        IPersistentDataProvider.of(creeper).putInt(TamedCreeperAppearance.COLOR_VARIANT_TAG, payload.variant());
+                    }
+                }));
 
-    @SubscribeEvent
-    static void onAddLayers(EntityRenderersEvent.AddLayers event) {
-        CreeperRenderer creeperRenderer = event.getRenderer(EntityType.CREEPER);
-        if (creeperRenderer != null) {
-            creeperRenderer.addLayer(new CreeperVariantTextureLayer(creeperRenderer));
-            creeperRenderer.addLayer(new CreeperHelmetLayer(creeperRenderer, event.getEntityModels(), event.getContext().getModelManager()));
-            creeperRenderer.addLayer(new CreeperChestplateLayer(creeperRenderer, event.getEntityModels(), event.getContext().getModelManager()));
-        }
+        MenuScreens.register(HappyCreeper.CREEPER_MENU, CreeperScreen::new);
 
-        for (PlayerSkin.Model skinModel : event.getSkins()) {
-            PlayerRenderer playerRenderer = event.getSkin(skinModel);
-            if (playerRenderer != null) {
-                playerRenderer.addLayer(new HappyCreeperMaskLayer(playerRenderer, event.getEntityModels()));
+        EntityModelLayerRegistry.registerModelLayer(CreeperHelmetModel.LAYER_LOCATION, CreeperHelmetModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(CreeperChestplateModel.LAYER_LOCATION, CreeperChestplateModel::createBodyLayer);
+
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
+            if (entityType == EntityType.CREEPER) {
+                @SuppressWarnings("unchecked")
+                RenderLayerParent<Creeper, CreeperModel<Creeper>> creeperRenderer =
+                        (RenderLayerParent<Creeper, CreeperModel<Creeper>>) entityRenderer;
+                registrationHelper.register(new CreeperVariantTextureLayer(creeperRenderer));
+                registrationHelper.register(new CreeperHelmetLayer(creeperRenderer, Minecraft.getInstance().getEntityModels(), Minecraft.getInstance().getModelManager()));
+                registrationHelper.register(new CreeperChestplateLayer(creeperRenderer, Minecraft.getInstance().getEntityModels(), Minecraft.getInstance().getModelManager()));
+            } else if (entityType == EntityType.PLAYER) {
+                @SuppressWarnings("unchecked")
+                RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> playerRenderer =
+                        (RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>>) entityRenderer;
+                registrationHelper.register(new HappyCreeperMaskLayer(playerRenderer, Minecraft.getInstance().getEntityModels()));
             }
-        }
-    }
-
-    @SubscribeEvent
-    static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
-        event.register(HappyCreeper.CREEPER_MENU.get(), CreeperScreen::new);
+        });
     }
 }

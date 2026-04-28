@@ -17,15 +17,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.armortrim.ArmorTrim;
-import net.neoforged.neoforge.client.ClientHooks;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 public final class CreeperChestplateLayer extends RenderLayer<Creeper, CreeperModel<Creeper>> {
     private final CreeperChestplateModel model;
@@ -57,22 +54,15 @@ public final class CreeperChestplateLayer extends RenderLayer<Creeper, CreeperMo
 
         this.model.setupAnim(creeper, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
-        IClientItemExtensions extensions = IClientItemExtensions.of(chestplate);
-        extensions.setupModelAnimations(creeper, chestplate, EquipmentSlot.CHEST, this.model, limbSwing, limbSwingAmount, partialTick, ageInTicks, netHeadYaw, headPitch);
-
         int overlay = LivingEntityRenderer.getOverlayCoords(creeper, 0.0F);
-        int fallbackColor = extensions.getDefaultDyeColor(chestplate);
         Holder<ArmorMaterial> armorMaterial = armorItem.getMaterial();
+        int dyeColor = chestplate.has(DataComponents.DYED_COLOR)
+                ? chestplate.get(DataComponents.DYED_COLOR).rgb() | 0xFF000000
+                : 0xFFFFFFFF;
 
-        for (int layerIndex = 0; layerIndex < armorMaterial.value().layers().size(); layerIndex++) {
-            ArmorMaterial.Layer armorLayer = armorMaterial.value().layers().get(layerIndex);
-            int color = extensions.getArmorLayerTintColor(chestplate, creeper, armorLayer, layerIndex, fallbackColor);
-            if (color == 0) {
-                continue;
-            }
-
-            ResourceLocation texture = ClientHooks.getArmorTexture(creeper, chestplate, armorLayer, false, EquipmentSlot.CHEST);
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.armorCutoutNoCull(texture));
+        for (ArmorMaterial.Layer armorLayer : armorMaterial.value().layers()) {
+            int color = armorLayer.dyeable() ? dyeColor : 0xFFFFFFFF;
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.armorCutoutNoCull(armorLayer.texture(false)));
             this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, overlay, color);
         }
 
