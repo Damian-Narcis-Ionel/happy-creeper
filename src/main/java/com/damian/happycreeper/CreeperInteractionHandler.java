@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -248,7 +249,8 @@ public final class CreeperInteractionHandler {
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        return stack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == slot;
+        Equippable equippable = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE);
+        return equippable != null && equippable.slot() == slot;
     }
 
     private static boolean applyPotionToCreeper(Player player, Creeper creeper, ItemStack stack, PotionContents potionContents) {
@@ -261,9 +263,7 @@ public final class CreeperInteractionHandler {
             player.displayClientMessage(Component.translatable("message.happycreeper.potion_no_effect").withStyle(ChatFormatting.YELLOW), true);
             return true;
         }
-        ItemStack remainder = stack.getItem().getCraftingRemainingItem() != null
-                ? new ItemStack(stack.getItem().getCraftingRemainingItem()) : ItemStack.EMPTY;
-        if (remainder.isEmpty() && stack.is(Items.POTION)) remainder = new ItemStack(Items.GLASS_BOTTLE);
+        ItemStack remainder = stack.is(Items.POTION) ? new ItemStack(Items.GLASS_BOTTLE) : ItemStack.EMPTY;
         player.setItemInHand(InteractionHand.MAIN_HAND,
                 ItemUtils.createFilledResult(stack, player, remainder.isEmpty() ? ItemStack.EMPTY : remainder.copy()));
         sendFeedback(player, creeper, "message.happycreeper.creeper_drank_potion");
@@ -272,7 +272,8 @@ public final class CreeperInteractionHandler {
 
     private static void applyPotionEffect(Player player, LivingEntity target, MobEffectInstance effect) {
         if (effect.getEffect().value().isInstantenous()) {
-            effect.getEffect().value().applyInstantenousEffect(player, player, target, effect.getAmplifier(), 1.0D);
+            effect.getEffect().value().applyInstantenousEffect(
+                    (ServerLevel) player.level(), player, player, target, effect.getAmplifier(), 1.0D);
             return;
         }
         target.addEffect(new MobEffectInstance(effect));

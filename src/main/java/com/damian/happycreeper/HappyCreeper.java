@@ -7,15 +7,19 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.equipment.Equippable;
 
 public class HappyCreeper implements ModInitializer {
     public static final String MODID = "happycreeper";
@@ -55,7 +59,12 @@ public class HappyCreeper implements ModInitializer {
     public static final Item FAKE_HAPPY_CREEPER_HEAD = Registry.register(
             BuiltInRegistries.ITEM,
             ResourceLocation.fromNamespaceAndPath(MODID, "fake_happy_creeper_head"),
-            new FakeCreeperHeadItem(new Item.Properties().stacksTo(1)));
+            new FakeCreeperHeadItem(new Item.Properties()
+                    .stacksTo(1)
+                    .component(DataComponents.EQUIPPABLE,
+                            Equippable.builder(EquipmentSlot.HEAD)
+                                    .setEquipSound(SoundEvents.ARMOR_EQUIP_GENERIC)
+                                    .build())));
 
     public static final MenuType<CreeperMenu> CREEPER_MENU = Registry.register(
             BuiltInRegistries.MENU,
