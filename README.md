@@ -1,12 +1,12 @@
 # Happy Creeper
 
-`Happy Creeper` is a Fabric mod for Minecraft `1.21.3` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
+`Happy Creeper` is a Fabric mod for Minecraft `1.21.2` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
 
 The mod is being developed for actual survival play, so the mechanics are meant to feel usable in a normal world and modpack, not just in a test map.
 
 ## Platform
 
-- Minecraft: `1.21.3`
+- Minecraft: `1.21.2`
 - Loader: `Fabric`
 - Java: `21`
 
