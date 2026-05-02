@@ -3,6 +3,7 @@ package com.damian.happycreeper;
 import com.damian.happycreeper.network.SyncColorVariantPacket;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Creeper;
 
 public final class TamedCreeperAppearance {
@@ -31,6 +32,13 @@ public final class TamedCreeperAppearance {
         if (!creeper.level().isClientSide()) {
             SyncColorVariantPacket packet = new SyncColorVariantPacket(creeper.getId(), variant);
             PlayerLookup.tracking(creeper).forEach(player -> ServerPlayNetworking.send(player, packet));
+        }
+    }
+
+    public static void syncToPlayer(Creeper creeper, ServerPlayer player) {
+        int variant = getVariant(creeper);
+        if (variant != NONE_VARIANT) {
+            ServerPlayNetworking.send(player, new SyncColorVariantPacket(creeper.getId(), variant));
         }
     }
 
