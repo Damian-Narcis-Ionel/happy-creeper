@@ -1,7 +1,6 @@
 package com.damian.happycreeper;
 
-import java.util.UUID;
-
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -52,20 +51,22 @@ public final class CreeperHeadProtectionHandler {
 
     private static void setRevengeTarget(Creeper creeper, Player player) {
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        data.putUUID(REVENGE_TARGET_TAG, player.getUUID());
+        data.store(REVENGE_TARGET_TAG, UUIDUtil.CODEC, player.getUUID());
         data.putInt(REVENGE_TICKS_TAG, REVENGE_DURATION_TICKS);
     }
 
     private static boolean isRevengeTarget(Creeper creeper, LivingEntity target) {
         if (!(target instanceof Player player)) return false;
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        if (!data.hasUUID(REVENGE_TARGET_TAG) || data.getInt(REVENGE_TICKS_TAG) <= 0) return false;
-        return data.getUUID(REVENGE_TARGET_TAG).equals(player.getUUID());
+        if (data.getIntOr(REVENGE_TICKS_TAG, 0) <= 0) return false;
+        return data.read(REVENGE_TARGET_TAG, UUIDUtil.CODEC)
+                .map(revengeTarget -> revengeTarget.equals(player.getUUID()))
+                .orElse(false);
     }
 
     private static void tickRevengeTimer(Creeper creeper) {
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        int remainingTicks = data.getInt(REVENGE_TICKS_TAG);
+        int remainingTicks = data.getIntOr(REVENGE_TICKS_TAG, 0);
         if (remainingTicks <= 0) { clearRevengeTarget(data); return; }
         data.putInt(REVENGE_TICKS_TAG, remainingTicks - 1);
         if (remainingTicks - 1 <= 0) clearRevengeTarget(data);

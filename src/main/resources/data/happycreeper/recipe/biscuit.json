@@ -7,12 +7,8 @@
     " W "
   ],
   "key": {
-    "W": {
-      "item": "minecraft:wheat"
-    },
-    "S": {
-      "item": "minecraft:sugar"
-    }
+    "W": "minecraft:wheat",
+    "S": "minecraft:sugar"
   },
   "result": {
     "id": "happycreeper:biscuit",

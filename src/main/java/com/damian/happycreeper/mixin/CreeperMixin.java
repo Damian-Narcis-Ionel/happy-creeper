@@ -31,8 +31,8 @@ abstract class CreeperMixin implements IPersistentDataProvider {
 
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     private void happycreeper$loadExtraData(CompoundTag pCompound, CallbackInfo ci) {
-        if (pCompound.contains("HappyCreeperExtraData", 10)) {
-            happycreeper$extraData = pCompound.getCompound("HappyCreeperExtraData");
+        if (pCompound.contains("HappyCreeperExtraData")) {
+            happycreeper$extraData = pCompound.getCompoundOrEmpty("HappyCreeperExtraData");
         }
     }
 
