@@ -12,7 +12,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -104,7 +106,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
             return;
         }
 
-        guiGraphics.blitSprite(HEART_SPRITE, HEART_ICON_X, HEART_ICON_Y, HEART_ICON_SIZE, HEART_ICON_SIZE);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, HEART_SPRITE, HEART_ICON_X, HEART_ICON_Y, HEART_ICON_SIZE, HEART_ICON_SIZE);
         guiGraphics.drawString(font,
                 Component.translatable("screen.happycreeper.creeper.health", menu.getDisplayedHealth(), menu.getDisplayedMaxHealth()),
                 HEALTH_TEXT_X,
@@ -136,7 +138,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
     }
 
     private static void renderSlot(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.blitSprite(SLOT_SPRITE, x, y, 18, 18);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_SPRITE, x, y, 18, 18);
     }
 
     @Override
@@ -148,7 +150,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
         renderSlot(guiGraphics, left + ARMOR_SLOT_X, top + HELMET_SLOT_Y);
         renderSlot(guiGraphics, left + ARMOR_SLOT_X, top + CHESTPLATE_SLOT_Y);
         renderSlot(guiGraphics, left + FUEL_SLOT_X, top + FUEL_SLOT_Y);
-        guiGraphics.blit(INVENTORY_TEXTURE, left, top + INVENTORY_SECTION_Y, 0, INVENTORY_SECTION_Y, imageWidth, INVENTORY_SECTION_HEIGHT, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, INVENTORY_TEXTURE, left, top + INVENTORY_SECTION_Y, 0.0F, (float) INVENTORY_SECTION_Y, imageWidth, INVENTORY_SECTION_HEIGHT, 256, 256);
         renderEffects(guiGraphics, left, top);
 
         Creeper creeper = menu.getCreeper();
@@ -178,9 +180,9 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
         int y = top + EFFECT_Y;
         for (int i = 0; i < effects.size(); i++) {
             MobEffectInstance effect = effects.get(i);
-            guiGraphics.blitSprite(EFFECT_BACKGROUND_SMALL_SPRITE, x, y + i * EFFECT_SPACING, 32, 32);
-            TextureAtlasSprite sprite = minecraft.getMobEffectTextures().get(effect.getEffect());
-            guiGraphics.blit(x + 7, y + 7 + i * EFFECT_SPACING, 0, 18, 18, sprite);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, EFFECT_BACKGROUND_SMALL_SPRITE, x, y + i * EFFECT_SPACING, 32, 32);
+            ResourceLocation effectTexture = getEffectTexture(effect);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, effectTexture, x + 7, y + 7 + i * EFFECT_SPACING, 0.0F, 0.0F, 18, 18, 18, 18);
         }
     }
 
@@ -199,7 +201,7 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
                 MobEffectInstance effect = effects.get(i);
                 List<Component> tooltip = new ArrayList<>();
                 tooltip.add(Component.translatable(effect.getDescriptionId()));
-                guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
+                guiGraphics.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
                 return;
             }
         }
@@ -233,11 +235,16 @@ public class CreeperScreen extends AbstractContainerScreen<CreeperMenu> {
             int x = leftPos + ABILITY_ICON_START_X + slot * ABILITY_ICON_SPACING;
             int y = topPos + ABILITY_ICON_Y;
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
-                guiGraphics.renderTooltip(font, Component.translatable(getAbilityTooltipKey(ability)), mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(font, Component.translatable(getAbilityTooltipKey(ability)), mouseX, mouseY);
                 return;
             }
             slot++;
         }
+    }
+
+    private static ResourceLocation getEffectTexture(MobEffectInstance effect) {
+        ResourceLocation effectId = BuiltInRegistries.MOB_EFFECT.getKey(effect.getEffect().value());
+        return ResourceLocation.withDefaultNamespace("textures/mob_effect/" + effectId.getPath() + ".png");
     }
 
     private static ItemStack getAbilityIcon(CreeperAbility ability) {
