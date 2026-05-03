@@ -12,8 +12,15 @@ import net.minecraft.world.entity.player.Player;
 
 public final class TamedCreeperOwner {
     private static final String OWNER_UUID_TAG = "HappyCreeperOwner";
+    private static final String OWNER_NAME_TAG = "HappyCreeperOwnerName";
 
     private TamedCreeperOwner() {
+    }
+
+    public static void setOwner(Creeper creeper, Player player) {
+        CompoundTag data = IPersistentDataProvider.of(creeper);
+        data.putUUID(OWNER_UUID_TAG, player.getUUID());
+        data.putString(OWNER_NAME_TAG, player.getGameProfile().getName());
     }
 
     public static void setOwner(Creeper creeper, UUID ownerUuid) {
@@ -29,14 +36,34 @@ public final class TamedCreeperOwner {
         return Optional.of(data.getUUID(OWNER_UUID_TAG));
     }
 
+    public static Optional<String> getOwnerName(Creeper creeper) {
+        String ownerName = IPersistentDataProvider.of(creeper).getString(OWNER_NAME_TAG);
+        return ownerName.isBlank() ? Optional.empty() : Optional.of(ownerName);
+    }
+
     public static boolean hasOwner(Creeper creeper) {
-        return getOwnerUuid(creeper).isPresent();
+        return getOwnerUuid(creeper).isPresent() || getOwnerName(creeper).isPresent();
     }
 
     public static boolean isOwner(Creeper creeper, Player player) {
-        return getOwnerUuid(creeper)
-                .map(ownerUuid -> ownerUuid.equals(player.getUUID()))
-                .orElse(false);
+        if (getOwnerUuid(creeper).map(ownerUuid -> ownerUuid.equals(player.getUUID())).orElse(false)) {
+            return true;
+        }
+
+        if (getOwnerName(creeper)
+                .filter(ownerName -> ownerName.equals(player.getGameProfile().getName()))
+                .isPresent()) {
+            setOwner(creeper, player);
+            return true;
+        }
+
+        MinecraftServer server = creeper.getServer();
+        if (server != null && server.isSingleplayer() && server.isSingleplayerOwner(player.getGameProfile())) {
+            setOwner(creeper, player);
+            return true;
+        }
+
+        return false;
     }
 
     public static Optional<ServerPlayer> getOwner(Creeper creeper) {
@@ -45,9 +72,33 @@ public final class TamedCreeperOwner {
             return Optional.empty();
         }
 
-        return getOwnerUuid(creeper)
+        Optional<ServerPlayer> ownerByUuid = getOwnerUuid(creeper)
                 .map(server.getPlayerList()::getPlayer)
                 .filter(ServerPlayer.class::isInstance)
                 .map(ServerPlayer.class::cast);
+        if (ownerByUuid.isPresent()) {
+            return ownerByUuid;
+        }
+
+        Optional<ServerPlayer> ownerByName = getOwnerName(creeper)
+                .flatMap(ownerName -> server.getPlayerList().getPlayers().stream()
+                        .filter(player -> ownerName.equals(player.getGameProfile().getName()))
+                        .findFirst());
+        if (ownerByName.isPresent()) {
+            setOwner(creeper, ownerByName.get());
+            return ownerByName;
+        }
+
+        if (!server.isSingleplayer()) {
+            return Optional.empty();
+        }
+
+        return server.getPlayerList().getPlayers().stream()
+                .filter(player -> server.isSingleplayerOwner(player.getGameProfile()))
+                .findFirst()
+                .map(player -> {
+                    setOwner(creeper, player);
+                    return player;
+                });
     }
 }

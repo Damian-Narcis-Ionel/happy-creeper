@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava)",
+      "Bash(git checkout *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(node -e *)",
+      "Bash(git ls-tree *)",
+      "Bash(./gradlew build *)",
+      "Bash(git push *)",
+      "Bash(git rm *)",
+      "WebSearch",
+      "WebFetch(domain:maven.neoforged.net)",
+      "WebFetch(domain:maven.parchmentmc.org)",
+      "WebFetch(domain:ldtteam.jfrog.io)",
+      "Bash(curl -s \"https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml\")",
+      "Bash(curl *)",
+      "PowerShell(curl *)",
+      "WebFetch(domain:maven.fabricmc.net)",
+      "PowerShell(head *)",
+      "PowerShell(git add *)",
+      "PowerShell(git diff HEAD -- src/main/java/com/damian/happycreeper/HappyCreeper.java | Select-Object -First 30)",
+      "PowerShell(git push *)",
+      "PowerShell(git checkout *)"
+    ]
+  }
+}
