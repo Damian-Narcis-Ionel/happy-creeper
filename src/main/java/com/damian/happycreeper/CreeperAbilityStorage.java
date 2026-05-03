@@ -10,16 +10,16 @@ public final class CreeperAbilityStorage {
     }
 
     public static boolean hasAbility(Creeper creeper, CreeperAbility ability) {
-        return (IPersistentDataProvider.of(creeper).getInt(ABILITIES_TAG) & ability.getMask()) != 0;
+        return (IPersistentDataProvider.of(creeper).getIntOr(ABILITIES_TAG, 0) & ability.getMask()) != 0;
     }
 
     public static void grantAbility(Creeper creeper, CreeperAbility ability) {
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        data.putInt(ABILITIES_TAG, data.getInt(ABILITIES_TAG) | ability.getMask());
+        data.putInt(ABILITIES_TAG, data.getIntOr(ABILITIES_TAG, 0) | ability.getMask());
         creeper.setPersistenceRequired();
     }
 
     public static int getBitmask(Creeper creeper) {
-        return IPersistentDataProvider.of(creeper).getInt(ABILITIES_TAG);
+        return IPersistentDataProvider.of(creeper).getIntOr(ABILITIES_TAG, 0);
     }
 }

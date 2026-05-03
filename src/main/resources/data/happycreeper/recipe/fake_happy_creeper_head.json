@@ -7,15 +7,9 @@
     " G "
   ],
   "key": {
-    "L": {
-      "item": "minecraft:leather"
-    },
-    "D": {
-      "item": "minecraft:green_dye"
-    },
-    "G": {
-      "item": "minecraft:gunpowder"
-    }
+    "L": "minecraft:leather",
+    "D": "minecraft:green_dye",
+    "G": "minecraft:gunpowder"
   },
   "result": {
     "id": "happycreeper:fake_happy_creeper_head",

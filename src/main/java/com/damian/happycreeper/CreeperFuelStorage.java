@@ -1,7 +1,6 @@
 package com.damian.happycreeper;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -16,11 +15,11 @@ public final class CreeperFuelStorage {
 
     public static ItemStack getFuelStack(Creeper creeper) {
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        if (!data.contains(FUEL_STACK_TAG, Tag.TAG_COMPOUND)) {
+        if (!data.contains(FUEL_STACK_TAG)) {
             return ItemStack.EMPTY;
         }
 
-        return ItemStack.parseOptional(creeper.level().registryAccess(), data.getCompound(FUEL_STACK_TAG));
+        return data.read(FUEL_STACK_TAG, ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
     }
 
     public static void setFuelStack(Creeper creeper, ItemStack stack) {
@@ -30,10 +29,7 @@ public final class CreeperFuelStorage {
             return;
         }
 
-        Tag saved = stack.saveOptional(creeper.level().registryAccess());
-        if (saved instanceof CompoundTag compoundTag) {
-            data.put(FUEL_STACK_TAG, compoundTag);
-        }
+        data.store(FUEL_STACK_TAG, ItemStack.OPTIONAL_CODEC, stack);
     }
 
     public static boolean isFuelItem(ItemStack stack) {

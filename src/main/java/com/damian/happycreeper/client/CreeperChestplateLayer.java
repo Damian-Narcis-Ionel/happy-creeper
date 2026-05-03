@@ -1,80 +1,71 @@
 package com.damian.happycreeper.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import java.util.Comparator;
+import java.util.List;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.CreeperModel;
-import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.core.Holder;
+import net.minecraft.client.renderer.entity.state.CreeperRenderState;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.phys.AABB;
 
-public final class CreeperChestplateLayer extends RenderLayer<Creeper, CreeperModel<Creeper>> {
+public final class CreeperChestplateLayer extends RenderLayer<CreeperRenderState, CreeperModel> {
     private final CreeperChestplateModel model;
-    private final TextureAtlas armorTrimAtlas;
+    private final EquipmentLayerRenderer equipmentRenderer;
 
-    public CreeperChestplateLayer(RenderLayerParent<Creeper, CreeperModel<Creeper>> renderer,
-            EntityModelSet modelSet,
-            ModelManager modelManager) {
+    public CreeperChestplateLayer(RenderLayerParent<CreeperRenderState, CreeperModel> renderer,
+            net.minecraft.client.model.geom.EntityModelSet modelSet,
+            EquipmentLayerRenderer equipmentRenderer) {
         super(renderer);
         this.model = new CreeperChestplateModel(modelSet.bakeLayer(CreeperChestplateModel.LAYER_LOCATION));
-        this.armorTrimAtlas = modelManager.getAtlas(Sheets.ARMOR_TRIMS_SHEET);
+        this.equipmentRenderer = equipmentRenderer;
     }
 
     @Override
     public void render(PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight,
-            Creeper creeper,
-            float limbSwing,
-            float limbSwingAmount,
-            float partialTick,
-            float ageInTicks,
-            float netHeadYaw,
-            float headPitch) {
+            CreeperRenderState renderState,
+            float yRot,
+            float xRot) {
+        Creeper creeper = findCreeperAt(renderState);
+        if (creeper == null) return;
+
         ItemStack chestplate = creeper.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(chestplate.getItem() instanceof ArmorItem armorItem) || armorItem.getEquipmentSlot() != EquipmentSlot.CHEST) {
-            return;
-        }
+        if (chestplate.isEmpty()) return;
 
-        this.model.setupAnim(creeper, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        Equippable equippable = chestplate.get(DataComponents.EQUIPPABLE);
+        if (equippable == null || equippable.slot() != EquipmentSlot.CHEST) return;
 
-        int overlay = LivingEntityRenderer.getOverlayCoords(creeper, 0.0F);
-        Holder<ArmorMaterial> armorMaterial = armorItem.getMaterial();
-        int dyeColor = chestplate.has(DataComponents.DYED_COLOR)
-                ? chestplate.get(DataComponents.DYED_COLOR).rgb() | 0xFF000000
-                : 0xFFFFFFFF;
+        ResourceKey<EquipmentAsset> assetId = equippable.assetId().orElse(null);
+        if (assetId == null) return;
 
-        for (ArmorMaterial.Layer armorLayer : armorMaterial.value().layers()) {
-            int color = armorLayer.dyeable() ? dyeColor : 0xFFFFFFFF;
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.armorCutoutNoCull(armorLayer.texture(false)));
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, overlay, color);
-        }
+        this.model.setupAnim(renderState);
+        this.equipmentRenderer.renderLayers(EquipmentClientInfo.LayerType.HUMANOID, assetId, this.model, chestplate, poseStack, bufferSource, packedLight);
+    }
 
-        ArmorTrim trim = chestplate.get(DataComponents.TRIM);
-        if (trim != null) {
-            TextureAtlasSprite trimSprite = this.armorTrimAtlas.getSprite(trim.outerTexture(armorMaterial));
-            VertexConsumer vertexConsumer = trimSprite.wrap(bufferSource.getBuffer(Sheets.armorTrimsSheet(trim.pattern().value().decal())));
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
-        }
-
-        if (chestplate.hasFoil()) {
-            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.armorEntityGlint()), packedLight, OverlayTexture.NO_OVERLAY);
-        }
+    private static Creeper findCreeperAt(CreeperRenderState renderState) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return null;
+        double x = renderState.x, y = renderState.y, z = renderState.z;
+        List<Creeper> candidates = mc.level.getEntitiesOfClass(Creeper.class,
+                new AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 1.5, z + 0.5));
+        if (candidates.isEmpty()) return null;
+        return candidates.stream()
+                .min(Comparator.comparingDouble(c -> c.distanceToSqr(x, y, z)))
+                .orElse(null);
     }
 }
