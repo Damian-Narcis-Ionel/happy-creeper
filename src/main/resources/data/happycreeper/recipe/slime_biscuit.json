@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "happycreeper:biscuit"
-    },
-    {
-      "item": "minecraft:slime_ball"
-    }
+    "happycreeper:biscuit",
+    "minecraft:slime_ball"
   ],
   "result": {
     "id": "happycreeper:slime_biscuit",

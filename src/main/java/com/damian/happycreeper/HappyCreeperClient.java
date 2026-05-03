@@ -16,12 +16,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.CreeperModel;
 import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.resources.model.EquipmentAssetManager;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
+import net.minecraft.client.renderer.entity.state.CreeperRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 
 public class HappyCreeperClient implements ClientModInitializer {
+    private static final java.lang.reflect.Field EQUIPMENT_ASSETS_FIELD = findEquipmentAssetsField();
+
     @Override
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(SyncColorVariantPacket.TYPE, (payload, context) ->
@@ -40,17 +46,38 @@ public class HappyCreeperClient implements ClientModInitializer {
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
             if (entityType == EntityType.CREEPER) {
                 @SuppressWarnings("unchecked")
-                RenderLayerParent<Creeper, CreeperModel<Creeper>> creeperRenderer =
-                        (RenderLayerParent<Creeper, CreeperModel<Creeper>>) entityRenderer;
+                RenderLayerParent<CreeperRenderState, CreeperModel> creeperRenderer =
+                        (RenderLayerParent<CreeperRenderState, CreeperModel>) entityRenderer;
+                EquipmentLayerRenderer equipmentRenderer = new EquipmentLayerRenderer(
+                        getEquipmentAssets(),
+                        Minecraft.getInstance().getModelManager().getAtlas(Sheets.ARMOR_TRIMS_SHEET));
                 registrationHelper.register(new CreeperVariantTextureLayer(creeperRenderer));
-                registrationHelper.register(new CreeperHelmetLayer(creeperRenderer, Minecraft.getInstance().getEntityModels(), Minecraft.getInstance().getModelManager()));
-                registrationHelper.register(new CreeperChestplateLayer(creeperRenderer, Minecraft.getInstance().getEntityModels(), Minecraft.getInstance().getModelManager()));
+                registrationHelper.register(new CreeperHelmetLayer(creeperRenderer, Minecraft.getInstance().getEntityModels(), equipmentRenderer));
+                registrationHelper.register(new CreeperChestplateLayer(creeperRenderer, Minecraft.getInstance().getEntityModels(), equipmentRenderer));
             } else if (entityType == EntityType.PLAYER) {
                 @SuppressWarnings("unchecked")
-                RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> playerRenderer =
-                        (RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>>) entityRenderer;
+                RenderLayerParent<PlayerRenderState, PlayerModel> playerRenderer =
+                        (RenderLayerParent<PlayerRenderState, PlayerModel>) entityRenderer;
                 registrationHelper.register(new HappyCreeperMaskLayer(playerRenderer, Minecraft.getInstance().getEntityModels()));
             }
         });
+    }
+
+    private static EquipmentAssetManager getEquipmentAssets() {
+        try {
+            return (EquipmentAssetManager) EQUIPMENT_ASSETS_FIELD.get(Minecraft.getInstance().getEntityRenderDispatcher());
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Could not access equipment assets", e);
+        }
+    }
+
+    private static java.lang.reflect.Field findEquipmentAssetsField() {
+        try {
+            java.lang.reflect.Field field = net.minecraft.client.renderer.entity.EntityRenderDispatcher.class.getDeclaredField("equipmentAssets");
+            field.setAccessible(true);
+            return field;
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Could not locate equipmentAssets field", e);
+        }
     }
 }
