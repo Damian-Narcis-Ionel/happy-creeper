@@ -3,6 +3,8 @@ package com.damian.happycreeper.mixin;
 import com.damian.happycreeper.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,17 +25,15 @@ abstract class CreeperMixin implements IPersistentDataProvider {
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
-    private void happycreeper$saveExtraData(CompoundTag pCompound, CallbackInfo ci) {
+    private void happycreeper$saveExtraData(ValueOutput output, CallbackInfo ci) {
         if (happycreeper$extraData != null && !happycreeper$extraData.isEmpty()) {
-            pCompound.put("HappyCreeperExtraData", happycreeper$extraData);
+            output.store("HappyCreeperExtraData", CompoundTag.CODEC, happycreeper$extraData);
         }
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
-    private void happycreeper$loadExtraData(CompoundTag pCompound, CallbackInfo ci) {
-        if (pCompound.contains("HappyCreeperExtraData", 10)) {
-            happycreeper$extraData = pCompound.getCompound("HappyCreeperExtraData");
-        }
+    private void happycreeper$loadExtraData(ValueInput input, CallbackInfo ci) {
+        happycreeper$extraData = input.read("HappyCreeperExtraData", CompoundTag.CODEC).orElse(null);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

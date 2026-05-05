@@ -1,13 +1,13 @@
 # Happy Creeper
 
-`Happy Creeper` is a NeoForge mod for Minecraft `1.21.1` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
+`Happy Creeper` is a Fabric mod for Minecraft `1.21.9` focused on one idea: turn creepers from a survival threat into a real companion you can weaken, tame, heal, recolor, and bring into combat.
 
 The mod is being developed for actual survival play, so the mechanics are meant to feel usable in a normal world and modpack, not just in a test map.
 
 ## Platform
 
-- Minecraft: `1.21.1`
-- Loader: `NeoForge`
+- Minecraft: `1.21.9`
+- Loader: `Fabric`
 - Java: `21`
 
 ## Core Loop
@@ -163,8 +163,8 @@ Leather Green Dye Leather
 
 1. Open the project root in IntelliJ IDEA.
 2. Make sure the project uses Java `21`.
-3. Let Gradle import the NeoForge project.
-4. Run the generated NeoForge client configuration.
+3. Let Gradle import the Fabric Loom project.
+4. Run the generated Fabric client configuration.
 
 ### Commands
 
@@ -187,17 +187,43 @@ If dependencies get out of sync:
 - Use `/reload` for recipes and loot-table style datapack resources.
 - Restart the game for Java code changes.
 
+### Persistence Verification
+
+For development reload checks:
+
+1. Tame a creeper.
+2. Give it one or more persistent states to verify:
+   - a color variant
+   - one ability biscuit
+   - fuel in the UI
+   - `stay` mode if relevant
+3. Leave the world and reopen it.
+4. Empty-hand right-click the creeper and confirm the UI still opens.
+5. In a development environment, run:
+
+```text
+/happycreeper verify nearest
+```
+
+The command reports the current creeper state, stored owner UUID and name, whether the current player matches the owner, whether the UI should open, the color variant, abilities, fuel, and stay state.
+
+If you need a specific entity instead of the nearest creeper:
+
+```text
+/happycreeper verify id <entityId>
+```
+
 ## Project Structure
 
 - [src/main/java/com/damian/happycreeper](/E:/McCode/happy-creeper/src/main/java/com/damian/happycreeper) contains the mod source
 - [src/main/resources](/E:/McCode/happy-creeper/src/main/resources) contains assets, loot, recipes, and mod resources
-- [src/main/templates/META-INF/neoforge.mods.toml](/E:/McCode/happy-creeper/src/main/templates/META-INF/neoforge.mods.toml) contains mod metadata
-- [build.gradle](/E:/McCode/happy-creeper/build.gradle) contains the NeoForge build configuration
+- [src/main/resources/fabric.mod.json](/E:/McCode/happy-creeper/src/main/resources/fabric.mod.json) contains mod metadata
+- [build.gradle](/E:/McCode/happy-creeper/build.gradle) contains the Fabric Loom build configuration
 - [gradle.properties](/E:/McCode/happy-creeper/gradle.properties) contains version and mod properties
 
 ## Release Status
 
-Version `1.2.0` is the first stable release. All core features are complete and stable.
+Current project version: `1.0.0`
 
 ## License
 

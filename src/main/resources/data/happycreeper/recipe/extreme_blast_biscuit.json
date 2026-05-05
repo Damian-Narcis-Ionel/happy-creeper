@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "happycreeper:biscuit"
-    },
-    {
-      "item": "minecraft:tnt"
-    }
+    "happycreeper:biscuit",
+    "minecraft:tnt"
   ],
   "result": {
     "id": "happycreeper:extreme_blast_biscuit",

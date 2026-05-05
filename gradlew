@@ -87,6 +87,11 @@ done
 APP_BASE_NAME=${0##*/}
 # Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
 APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
+GRADLE_LOCAL_TMP="$APP_HOME/.gradle-tmp"
+mkdir -p "$GRADLE_LOCAL_TMP"
+TMP="$GRADLE_LOCAL_TMP"
+TEMP="$GRADLE_LOCAL_TMP"
+export TMP TEMP
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum

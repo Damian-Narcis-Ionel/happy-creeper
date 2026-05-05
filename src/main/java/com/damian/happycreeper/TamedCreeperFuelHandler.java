@@ -31,7 +31,7 @@ public final class TamedCreeperFuelHandler {
     }
 
     private static int getCooldown(Creeper creeper) {
-        return IPersistentDataProvider.of(creeper).getInt(HEAL_COOLDOWN_TAG);
+        return IPersistentDataProvider.of(creeper).getIntOr(HEAL_COOLDOWN_TAG, 0);
     }
 
     private static void setCooldown(Creeper creeper, int cooldown) {
