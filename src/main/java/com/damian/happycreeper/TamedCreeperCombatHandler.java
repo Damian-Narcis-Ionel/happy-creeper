@@ -43,9 +43,9 @@ public final class TamedCreeperCombatHandler {
         ServerPlayer owner = TamedCreeperOwner.getOwner(creeper).orElse(null);
         if (owner == null || !owner.isAlive() || owner.isSpectator()) return;
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        int cooldown = data.getInt(BLAST_COOLDOWN_TAG);
+        int cooldown = data.getIntOr(BLAST_COOLDOWN_TAG, 0);
         if (cooldown > 0) data.putInt(BLAST_COOLDOWN_TAG, cooldown - 1);
-        int slimeCooldown = data.getInt(SLIME_JUMP_COOLDOWN_TAG);
+        int slimeCooldown = data.getIntOr(SLIME_JUMP_COOLDOWN_TAG, 0);
         if (slimeCooldown > 0) data.putInt(SLIME_JUMP_COOLDOWN_TAG, slimeCooldown - 1);
         if (tickActiveSlimeJump(creeper, owner, data)) return;
         LivingEntity currentTarget = creeper.getTarget();
@@ -76,7 +76,7 @@ public final class TamedCreeperCombatHandler {
     }
 
     private static boolean tickActiveSlimeJump(Creeper creeper, ServerPlayer owner, CompoundTag data) {
-        int targetId = data.getInt(SLIME_TARGET_ID_TAG);
+        int targetId = data.getIntOr(SLIME_TARGET_ID_TAG, 0);
         if (targetId == 0) return false;
         if (!(creeper.level() instanceof ServerLevel serverLevel)) {
             data.putInt(SLIME_TARGET_ID_TAG, 0);
@@ -89,7 +89,7 @@ public final class TamedCreeperCombatHandler {
             data.putInt(SLIME_STICK_TICKS_TAG, 0);
             return false;
         }
-        int stickTicks = data.getInt(SLIME_STICK_TICKS_TAG);
+        int stickTicks = data.getIntOr(SLIME_STICK_TICKS_TAG, 0);
         if (stickTicks > 0) {
             creeper.getNavigation().stop();
             creeper.teleportTo(target.getX(), target.getY(), target.getZ());
@@ -110,7 +110,7 @@ public final class TamedCreeperCombatHandler {
 
     private static boolean tryStartSlimeJump(Creeper creeper, CompoundTag data, LivingEntity target) {
         if (!CreeperAbilityStorage.hasAbility(creeper, CreeperAbility.SLIME_JUMP)) return false;
-        if (data.getInt(SLIME_JUMP_COOLDOWN_TAG) > 0) return false;
+        if (data.getIntOr(SLIME_JUMP_COOLDOWN_TAG, 0) > 0) return false;
         if (target == null || !target.isAlive()) return false;
         if (isInBlastRange(creeper, target)) return false;
         if (!(creeper.level() instanceof ServerLevel serverLevel)) return false;

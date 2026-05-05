@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "happycreeper:biscuit"
-    },
-    {
-      "tag": "minecraft:fishes"
-    }
+    "happycreeper:biscuit",
+    "#minecraft:fishes"
   ],
   "result": {
     "id": "happycreeper:fish_biscuit",

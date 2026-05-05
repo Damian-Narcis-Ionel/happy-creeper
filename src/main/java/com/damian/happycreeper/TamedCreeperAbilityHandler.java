@@ -1,6 +1,6 @@
 package com.damian.happycreeper;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 
 public final class TamedCreeperAbilityHandler {
-    private static final ResourceLocation SWIM_SPEED_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "swim_speed_bonus");
+    private static final Identifier SWIM_SPEED_BONUS_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "swim_speed_bonus");
     private static final double SWIM_SPEED_BONUS = 0.4D;
     private static final int FIRE_RESISTANCE_REFRESH_THRESHOLD = 40;
     private static final int FIRE_RESISTANCE_DURATION = 200;

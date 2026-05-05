@@ -1,6 +1,10 @@
 plugins {
-    id 'fabric-loom' version '1.8.4'
+    id 'fabric-loom' version '1.13.3'
     id 'maven-publish'
+}
+
+loom {
+    enableModProvidedJavadoc.set(false)
 }
 
 version = project.mod_version

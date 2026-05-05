@@ -1,7 +1,7 @@
 package com.damian.happycreeper;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -12,13 +12,13 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.item.ItemStack;
 
 public final class TamedCreeperAttributeHandler {
-    private static final ResourceLocation TAMED_HEALTH_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_health_bonus");
-    private static final ResourceLocation TAMED_ARMOR_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_armor_bonus");
-    private static final ResourceLocation TAMED_TOUGHNESS_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_toughness_bonus");
-    private static final ResourceLocation TAMED_KNOCKBACK_BONUS_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_knockback_bonus");
-    private static final ResourceLocation LEGACY_ARMOR_NORMALIZATION_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_armor_normalization");
-    private static final ResourceLocation LEGACY_TOUGHNESS_NORMALIZATION_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_toughness_normalization");
-    private static final ResourceLocation LEGACY_KNOCKBACK_NORMALIZATION_ID = ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_knockback_normalization");
+    private static final Identifier TAMED_HEALTH_BONUS_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_health_bonus");
+    private static final Identifier TAMED_ARMOR_BONUS_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_armor_bonus");
+    private static final Identifier TAMED_TOUGHNESS_BONUS_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_toughness_bonus");
+    private static final Identifier TAMED_KNOCKBACK_BONUS_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_knockback_bonus");
+    private static final Identifier LEGACY_ARMOR_NORMALIZATION_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_armor_normalization");
+    private static final Identifier LEGACY_TOUGHNESS_NORMALIZATION_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_toughness_normalization");
+    private static final Identifier LEGACY_KNOCKBACK_NORMALIZATION_ID = Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "tamed_knockback_normalization");
     private static final AttributeModifier TAMED_HEALTH_BONUS = new AttributeModifier(TAMED_HEALTH_BONUS_ID, 20.0D, Operation.ADD_VALUE);
 
     private TamedCreeperAttributeHandler() {}
@@ -80,7 +80,7 @@ public final class TamedCreeperAttributeHandler {
         return total[0];
     }
 
-    private static void applyOrRemoveBonusModifier(AttributeInstance attribute, ResourceLocation modifierId, double amount) {
+    private static void applyOrRemoveBonusModifier(AttributeInstance attribute, Identifier modifierId, double amount) {
         if (attribute == null) return;
         if (Math.abs(amount) < 1.0E-6D) {
             attribute.removeModifier(modifierId);
@@ -89,11 +89,11 @@ public final class TamedCreeperAttributeHandler {
         attribute.addOrReplacePermanentModifier(new AttributeModifier(modifierId, amount, Operation.ADD_VALUE));
     }
 
-    private static void removeLegacyModifier(AttributeInstance attribute, ResourceLocation modifierId) {
+    private static void removeLegacyModifier(AttributeInstance attribute, Identifier modifierId) {
         if (attribute != null) attribute.removeModifier(modifierId);
     }
 
-    private static void removeBonusModifier(AttributeInstance attribute, ResourceLocation modifierId) {
+    private static void removeBonusModifier(AttributeInstance attribute, Identifier modifierId) {
         if (attribute != null) attribute.removeModifier(modifierId);
     }
 }

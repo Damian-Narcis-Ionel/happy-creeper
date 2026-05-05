@@ -5,11 +5,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record SyncColorVariantPacket(int entityId, int variant) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<SyncColorVariantPacket> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "sync_color_variant"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "sync_color_variant"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncColorVariantPacket> CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, SyncColorVariantPacket::entityId,

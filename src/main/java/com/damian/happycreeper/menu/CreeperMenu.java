@@ -9,7 +9,7 @@ import com.damian.happycreeper.TamedCreeperCommandState;
 import com.damian.happycreeper.TamedCreeperOwner;
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -21,8 +21,8 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.item.Items;
 
 public class CreeperMenu extends AbstractContainerMenu {
@@ -212,7 +212,8 @@ public class CreeperMenu extends AbstractContainerMenu {
     }
 
     private static boolean isArmorItemForSlot(ItemStack stack, EquipmentSlot slot) {
-        return stack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == slot;
+        Equippable equippable = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE);
+        return equippable != null && equippable.slot() == slot;
     }
 
     private static Creeper getCreeper(Inventory playerInventory, int creeperId) {
@@ -225,9 +226,9 @@ public class CreeperMenu extends AbstractContainerMenu {
 
     private final class CreeperArmorSlot extends Slot {
         private final EquipmentSlot equipmentSlot;
-        private final ResourceLocation emptyIcon;
+        private final Identifier emptyIcon;
 
-        private CreeperArmorSlot(EquipmentSlot equipmentSlot, int index, int x, int y, ResourceLocation emptyIcon) {
+        private CreeperArmorSlot(EquipmentSlot equipmentSlot, int index, int x, int y, Identifier emptyIcon) {
             super(new SimpleContainer(2), index, x, y);
             this.equipmentSlot = equipmentSlot;
             this.emptyIcon = emptyIcon;
@@ -283,8 +284,8 @@ public class CreeperMenu extends AbstractContainerMenu {
         }
 
         @Override
-        public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-            return Pair.of(InventoryMenu.BLOCK_ATLAS, emptyIcon);
+        public Identifier getNoItemIcon() {
+            return emptyIcon;
         }
 
         @Override

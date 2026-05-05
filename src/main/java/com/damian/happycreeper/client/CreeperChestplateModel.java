@@ -2,27 +2,25 @@ package com.damian.happycreeper.client;
 
 import com.damian.happycreeper.HappyCreeper;
 
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.ModelPart; // needed for bakeLayer param
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.client.renderer.entity.state.CreeperRenderState;
+import net.minecraft.resources.Identifier;
 
-public final class CreeperChestplateModel extends HierarchicalModel<Creeper> {
+public final class CreeperChestplateModel extends EntityModel<CreeperRenderState> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_chestplate"),
+            Identifier.fromNamespaceAndPath(HappyCreeper.MODID, "creeper_chestplate"),
             "main");
 
-    private final ModelPart root;
-
     public CreeperChestplateModel(ModelPart root) {
-        this.root = root;
+        super(root);
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -37,11 +35,7 @@ public final class CreeperChestplateModel extends HierarchicalModel<Creeper> {
     }
 
     @Override
-    public void setupAnim(Creeper entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(CreeperRenderState renderState) {
     }
 
-    @Override
-    public ModelPart root() {
-        return this.root;
-    }
 }

@@ -13,6 +13,11 @@ out/
 !**/src/**/out/
 
 .run/
+.gradle-tmp/
+.worktrees/
+hsperfdata_*/
+**/hsperfdata_*/
+**/hsperfdata/
 
 ### Eclipse ###
 .apt_generated

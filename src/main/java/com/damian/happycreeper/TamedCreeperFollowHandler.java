@@ -3,9 +3,10 @@ package com.damian.happycreeper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 
 public final class TamedCreeperFollowHandler {
     private static final double FOLLOW_SPEED = 1.35D;
@@ -54,16 +55,17 @@ public final class TamedCreeperFollowHandler {
 
     private static boolean tryChangeDimensionNearOwner(Creeper creeper, ServerPlayer owner) {
         if (!(owner.level() instanceof ServerLevel destinationLevel)) return false;
-        Creeper teleportedCreeper = (Creeper)creeper.changeDimension(
-                new DimensionTransition(destinationLevel, owner, DimensionTransition.PLACE_PORTAL_TICKET));
-        if (teleportedCreeper == null) return false;
+        Entity teleported = creeper.teleport(
+                new TeleportTransition(destinationLevel, owner.position(), owner.getDeltaMovement(), owner.getYRot(), owner.getXRot(),
+                        TeleportTransition.PLACE_PORTAL_TICKET));
+        if (!(teleported instanceof Creeper teleportedCreeper)) return false;
         teleportedCreeper.getNavigation().stop();
         return tryTeleportNearOwner(teleportedCreeper, owner);
     }
 
     private static void syncOwnedCreepersToPlayer(ServerPlayer player) {
-        if (!player.isAlive() || player.isSpectator() || player.getServer() == null) return;
-        for (ServerLevel level : player.getServer().getAllLevels()) {
+        if (!player.isAlive() || player.isSpectator() || player.level().getServer() == null) return;
+        for (ServerLevel level : player.level().getServer().getAllLevels()) {
             for (var entity : level.getAllEntities()) {
                 if (!(entity instanceof Creeper creeper)) continue;
                 if (CreeperState.get(creeper) != CreeperState.TAMED) continue;

@@ -1,31 +1,39 @@
 package com.damian.happycreeper.client;
 
-import com.damian.happycreeper.TamedCreeperAppearance;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import java.util.Comparator;
+import java.util.List;
 
-import net.minecraft.client.model.CreeperModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import com.damian.happycreeper.TamedCreeperAppearance;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.monster.creeper.CreeperModel;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.renderer.entity.state.CreeperRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.phys.AABB;
 
-public final class CreeperVariantTextureLayer extends RenderLayer<Creeper, CreeperModel<Creeper>> {
-    private static final ResourceLocation HAPPY_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/happycreeper.png");
-    private static final ResourceLocation BLUE_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/blue_creeper.png");
-    private static final ResourceLocation CYAN_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/cyan_creeper.png");
-    private static final ResourceLocation GRAY_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/gray_creeper.png");
-    private static final ResourceLocation YELLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/yellow_creeper.png");
-    private static final ResourceLocation PINK_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/pink_creeper.png");
-    private static final ResourceLocation PURPLE_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/purple_creeper.png");
-    private static final ResourceLocation RED_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/red_creeper.png");
-    private static final ResourceLocation BLACK_TEXTURE = ResourceLocation.fromNamespaceAndPath("happycreeper", "textures/item/black_creeper.png");
+public final class CreeperVariantTextureLayer extends RenderLayer<CreeperRenderState, CreeperModel> {
+    private static final Identifier HAPPY_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/happycreeper.png");
+    private static final Identifier BLUE_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/blue_creeper.png");
+    private static final Identifier CYAN_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/cyan_creeper.png");
+    private static final Identifier GRAY_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/gray_creeper.png");
+    private static final Identifier YELLOW_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/yellow_creeper.png");
+    private static final Identifier PINK_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/pink_creeper.png");
+    private static final Identifier PURPLE_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/purple_creeper.png");
+    private static final Identifier RED_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/red_creeper.png");
+    private static final Identifier BLACK_TEXTURE = Identifier.fromNamespaceAndPath("happycreeper", "textures/item/black_creeper.png");
     private static final int FULL_COLOR = 0xFFFFFFFF;
     private static final int RAINBOW_CYCLE_TICKS = 8;
-    private static final ResourceLocation[] RAINBOW_TEXTURES = new ResourceLocation[] {
+    private static final Identifier[] RAINBOW_TEXTURES = new Identifier[] {
             RED_TEXTURE,
             YELLOW_TEXTURE,
             HAPPY_TEXTURE,
@@ -35,23 +43,22 @@ public final class CreeperVariantTextureLayer extends RenderLayer<Creeper, Creep
             PINK_TEXTURE
     };
 
-    public CreeperVariantTextureLayer(RenderLayerParent<Creeper, CreeperModel<Creeper>> renderer) {
+    public CreeperVariantTextureLayer(RenderLayerParent<CreeperRenderState, CreeperModel> renderer) {
         super(renderer);
     }
 
     @Override
-    public void render(com.mojang.blaze3d.vertex.PoseStack poseStack,
-            MultiBufferSource bufferSource,
+    public void submit(PoseStack poseStack,
+            SubmitNodeCollector submitNodeCollector,
             int packedLight,
-            Creeper creeper,
-            float limbSwing,
-            float limbSwingAmount,
-            float partialTick,
-            float ageInTicks,
-            float netHeadYaw,
-            float headPitch) {
+            CreeperRenderState renderState,
+            float yRot,
+            float xRot) {
+        Creeper creeper = findCreeperAt(renderState);
+        if (creeper == null) return;
+
         int variant = TamedCreeperAppearance.getVariant(creeper);
-        ResourceLocation texture = switch (variant) {
+        Identifier texture = switch (variant) {
             case TamedCreeperAppearance.HAPPY_VARIANT -> HAPPY_TEXTURE;
             case TamedCreeperAppearance.BLUE_VARIANT -> BLUE_TEXTURE;
             case TamedCreeperAppearance.CYAN_VARIANT -> CYAN_TEXTURE;
@@ -66,7 +73,7 @@ public final class CreeperVariantTextureLayer extends RenderLayer<Creeper, Creep
         };
 
         if (variant == TamedCreeperAppearance.RAINBOW_VARIANT) {
-            renderRainbow(poseStack, bufferSource, packedLight, creeper, partialTick);
+            submitRainbow(poseStack, submitNodeCollector, packedLight, renderState);
             return;
         }
 
@@ -74,44 +81,72 @@ public final class CreeperVariantTextureLayer extends RenderLayer<Creeper, Creep
             return;
         }
 
-        renderColoredCutoutModel(getParentModel(), texture, poseStack, bufferSource, packedLight, creeper, FULL_COLOR);
+        renderColoredCutoutModel(getParentModel(), texture, poseStack, submitNodeCollector, packedLight, renderState, FULL_COLOR,
+                LivingEntityRenderer.getOverlayCoords(renderState, 0.0F));
     }
 
-    private void renderRainbow(com.mojang.blaze3d.vertex.PoseStack poseStack,
-            MultiBufferSource bufferSource,
+    private void submitRainbow(PoseStack poseStack,
+            SubmitNodeCollector submitNodeCollector,
             int packedLight,
-            Creeper creeper,
-            float partialTick) {
-        RainbowFrame frame = getRainbowFrame(creeper, partialTick);
-        renderTranslucentTexture(poseStack, bufferSource, packedLight, creeper, frame.currentTexture, FULL_COLOR);
+            CreeperRenderState renderState) {
+        Creeper creeper = findCreeperAt(renderState);
+        if (creeper == null) {
+            return;
+        }
 
-        if (frame.blend > 0.0F) {
-            int overlayColor = FastColor.ARGB32.color(Math.round(frame.blend * 255.0F), 255, 255, 255);
-            renderTranslucentTexture(poseStack, bufferSource, packedLight, creeper, frame.nextTexture, overlayColor);
+        RainbowFrame frame = getRainbowFrame(creeper, renderState);
+        submitTexture(poseStack, submitNodeCollector, packedLight, renderState, frame.currentTexture(), FULL_COLOR, 0);
+
+        if (frame.blend() > 0.0F) {
+            int alpha = Math.round(frame.blend() * 255.0F);
+            int color = ARGB.color(alpha, 255, 255, 255);
+            submitTexture(poseStack, submitNodeCollector, packedLight, renderState, frame.nextTexture(), color, 1);
         }
     }
 
-    private void renderTranslucentTexture(com.mojang.blaze3d.vertex.PoseStack poseStack,
-            MultiBufferSource bufferSource,
+    private void submitTexture(PoseStack poseStack,
+            SubmitNodeCollector submitNodeCollector,
             int packedLight,
-            Creeper creeper,
-            ResourceLocation texture,
-            int color) {
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityTranslucent(texture));
-        getParentModel().renderToBuffer(poseStack,
-                vertexConsumer,
+            CreeperRenderState renderState,
+            Identifier texture,
+            int color,
+            int order) {
+        OrderedSubmitNodeCollector ordered = submitNodeCollector.order(order);
+        ordered.submitModel(
+                getParentModel(),
+                renderState,
+                poseStack,
+                RenderTypes.entityTranslucent(texture),
                 packedLight,
-                LivingEntityRenderer.getOverlayCoords(creeper, 0.0F),
-                color);
+                LivingEntityRenderer.getOverlayCoords(renderState, 0.0F),
+                color,
+                null,
+                renderState.outlineColor,
+                null);
     }
 
-    private static RainbowFrame getRainbowFrame(Creeper creeper, float partialTick) {
-        float cycleProgress = (((float) (creeper.tickCount % RAINBOW_CYCLE_TICKS)) + partialTick) / (float) RAINBOW_CYCLE_TICKS;
-        int textureIndex = (creeper.tickCount / RAINBOW_CYCLE_TICKS + creeper.getId()) % RAINBOW_TEXTURES.length;
+    private static RainbowFrame getRainbowFrame(Creeper creeper, CreeperRenderState renderState) {
+        float cyclePosition = renderState.ageInTicks / (float) RAINBOW_CYCLE_TICKS;
+        int baseFrame = Mth.floor(cyclePosition);
+        float cycleProgress = cyclePosition - baseFrame;
+        int phaseOffset = Math.floorMod(creeper.getId(), RAINBOW_TEXTURES.length);
+        int textureIndex = Math.floorMod(baseFrame + phaseOffset, RAINBOW_TEXTURES.length);
         int nextTextureIndex = (textureIndex + 1) % RAINBOW_TEXTURES.length;
         return new RainbowFrame(RAINBOW_TEXTURES[textureIndex], RAINBOW_TEXTURES[nextTextureIndex], cycleProgress);
     }
 
-    private record RainbowFrame(ResourceLocation currentTexture, ResourceLocation nextTexture, float blend) {
+    private static Creeper findCreeperAt(CreeperRenderState renderState) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return null;
+        double x = renderState.x, y = renderState.y, z = renderState.z;
+        List<Creeper> candidates = mc.level.getEntitiesOfClass(Creeper.class,
+                new AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 1.5, z + 0.5));
+        if (candidates.isEmpty()) return null;
+        return candidates.stream()
+                .min(Comparator.comparingDouble(c -> c.distanceToSqr(x, y, z)))
+                .orElse(null);
+    }
+
+    private record RainbowFrame(Identifier currentTexture, Identifier nextTexture, float blend) {
     }
 }

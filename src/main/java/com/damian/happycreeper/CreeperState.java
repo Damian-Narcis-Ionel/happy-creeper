@@ -18,7 +18,7 @@ public enum CreeperState {
 
     public static CreeperState get(Creeper creeper) {
         CompoundTag data = IPersistentDataProvider.of(creeper);
-        String value = data.getString(STATE_TAG);
+        String value = data.getStringOr(STATE_TAG, "");
 
         for (CreeperState state : values()) {
             if (state.serializedName.equals(value)) {
